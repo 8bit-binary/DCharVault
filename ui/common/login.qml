@@ -45,7 +45,8 @@ Item {
     Rectangle {
         anchors.centerIn: parent
         width: 340
-        height: mainColumn.implicitHeight + 40
+        height: Math.max(loginColumn.implicitHeight,
+                         createColumn.implicitHeight) + 40
         color: ThemeManager.bgCard
         border.color: ThemeManager.lineBorder
         border.width: 1
@@ -144,6 +145,17 @@ Item {
 
             Button {
                 text: "Create New Journal"
+                background: Rectangle {
+                    color: parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton
+                    radius: ThemeManager.radiusDefault
+                    border.color: ThemeManager.lineBorder
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: ThemeManager.textMain
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
                 flat: true
                 Layout.fillWidth: true
                 onClicked: {
@@ -205,6 +217,17 @@ Item {
                 text: "Create New Journal"
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
+                background: Rectangle {
+                    color: parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton
+                    radius: ThemeManager.radiusDefault
+                    border.color: ThemeManager.lineBorder
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: ThemeManager.textMain
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
                 enabled: newJournalName.text !== ""
                 onClicked: {
                     console.log("QML: Open save dialog to pick location.")
@@ -224,6 +247,17 @@ Item {
             Button {
                 text: "Back To Login"
                 flat: true
+                background: Rectangle {
+                    color: parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton
+                    radius: ThemeManager.radiusDefault
+                    border.color: ThemeManager.lineBorder
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: ThemeManager.textMain
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
                 Layout.fillWidth: true
                 onClicked: {
                     isCreatingNew = false
