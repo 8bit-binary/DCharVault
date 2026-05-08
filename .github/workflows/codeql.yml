@@ -84,18 +84,26 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+    - name: Install System Dependencies
+      if: matrix.build-mode == 'manual'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-dev libsodium-dev pkg-config
+
+    - name: Install Qt 6.8.2
+      if: matrix.build-mode == 'manual'
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.8.2'
+        host: 'linux'
+        modules: 'qt5compat qtshadertools qtquick3d'
+        cache: true
+
     - name: Run manual build steps
       if: matrix.build-mode == 'manual'
       shell: bash
       run: |
-        # Install required dependencies
-        sudo apt-get update
-        sudo apt-get install -y libsodium-dev qt6-base-dev qt6-declarative-dev
-        
-        # Configure CMake (we turn off tests here just for the CodeQL scan to run faster)
         cmake -B build -DBUILD_TESTS=OFF
-        
-        # Build the project
         cmake --build build
 
     - name: Perform CodeQL Analysis
