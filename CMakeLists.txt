@@ -80,10 +80,33 @@ if(UNIX AND NOT ANDROID AND NOT APPLE)
 endif()
 
 
-# -APP TARGET
+# Core Static Libs
+add_library(DCharVault_Core STATIC
+    model/EncryptionManager.cpp
+    model/DatabaseManager.cpp
+    model/DiaryManager.cpp
+    model/DiaryEntry.cpp
+    model/VaultModel.cpp
+)
+target_link_libraries(DCharVault_Core PRIVATE ${SODIUM_LIB} Qt6::Core Qt6::Sql Qt6::Gui)
+target_include_directories(DCharVault_Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 qt_add_executable(appDCharVault
-    MANUAL_FINALIZATION
     main.cpp
+)
+
+# static DCharVault_Core linking to appDCharVault
+target_link_libraries(appDCharVault
+    PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
+    Qt6::QuickDialogs2
+    Qt6::Sql
+    ${SODIUM_LIB}
+    DCharVault_Core #app connects to the models
 )
 
 set(APP_QML_FILES
@@ -122,19 +145,13 @@ qt_add_qml_module(appDCharVault
     QML_FILES
         ${APP_QML_FILES}
     SOURCES
+        # Headers for to MOC knows about Q_PROPERTY and Q_INVOKABLE
         model/DiaryEntry.h
         model/DiaryManager.h
         model/DatabaseManager.h
         model/EncryptionManager.h
         model/TitleGenerators.h
         model/SecureAllocator.h
-
-        model/DiaryEntry.cpp
-        model/VaultModel.cpp
-        model/DiaryManager.cpp
-        model/DatabaseManager.cpp
-        model/EncryptionManager.cpp
-
         viewmodel/SecurePasswordInput.h
         viewmodel/DiaryListModel.h
         viewmodel/LoginViewModel.h
@@ -147,7 +164,6 @@ qt_add_qml_module(appDCharVault
         viewmodel/SecurePasswordInput.cpp
         viewmodel/ClipboardSanitizer.cpp
 )
-
 
 set_target_properties(appDCharVault PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appDCharVault
@@ -180,4 +196,4 @@ install(TARGETS appDCharVault
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-qt_finalize_executable(appDCharVault)
+# qt_finalize_executable(appDCharVault)
