@@ -37,7 +37,8 @@ Item {
         onAccepted: {
             console.log("QML: Save location selected: " + currentFile)
             // Name matches the ID of the creation password field below
-            loginViewModel.createVault(newJournalName.text,newVaultPassword.secureInputComponent,
+            loginViewModel.createVault(newJournalName.text,
+                                       newVaultPassword.secureInputComponent,
                                        currentFile)
         }
     }
@@ -50,7 +51,7 @@ Item {
         color: ThemeManager.bgCard
         border.color: ThemeManager.lineBorder
         border.width: 1
-        radius: 12
+        radius: ThemeManager.radiusDefault
 
         // STATE 1: LOGIN JOURNAL
         ColumnLayout {
@@ -89,7 +90,8 @@ Item {
             }
 
             Text {
-                text: selectedDBUrl === "" ? "No Journal selected" : "Ready to unlock selected Journal."
+                text: selectedDBUrl
+                      === "" ? "No Journal selected" : "Ready to unlock selected Journal."
                 color: selectedDBUrl === "" ? "#ef4444" : "#10b981"
                 font.pixelSize: 13
                 Layout.alignment: Qt.AlignHCenter
@@ -121,15 +123,16 @@ Item {
                 text: "Unlock Journal"
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
-                background: Rectangle{
-                    color: parent.enabled ? (parent.hovered ? Qt.lighter(ThemeManager.colorAccent, 1.1) : ThemeManager.colorAccent)
-                                          : ThemeManager.bgButton
+                background: Rectangle {
+                    color: parent.enabled ? (parent.hovered ? Qt.lighter(
+                                                                  ThemeManager.colorAccent,
+                                                                  1.1) : ThemeManager.colorAccent) : ThemeManager.bgButton
                     radius: ThemeManager.radiusDefault
                     border.color: ThemeManager.lineBorder
                 }
-                contentItem: Text{
+                contentItem: Text {
                     text: parent.text
-                    color: parent.enabled ? "#FFFFFF" : ThemeManager.textMuted
+                    color: parent.enabled ? ThemeManager.bgVault : ThemeManager.textMuted
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
@@ -193,6 +196,12 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 30
                 color: ThemeManager.textMain
+                placeholderTextColor: ThemeManager.textMuted
+                background: Rectangle {
+                    color: ThemeManager.bgInput
+                    radius: ThemeManager.radiusDefault
+                    border.color: ThemeManager.lineBorder
+                }
             }
 
             Label {
