@@ -1,59 +1,57 @@
-#include <gtest/gtest.h>
-#include <sodium.h>
-#include <string>
-#include <vector>
+#include<gtest/gtest.h>
+#include<QString>
+#include<QByteArray>
+#include"model/EncryptionManager.h"
+#include"model/SecureAllocator.h"
 
-// Fixture to ensure LibSodium is initialized before any crypto test runs
-class CryptoTest : public ::testing::Test {
+class EncryptionManagerTest : public ::testing::Test{
 protected:
-    void SetUp() override {
-        // sodium_init() returns -1 on critical failure, 0 on success, 1 if already initialized
-        ASSERT_GE(sodium_init(), 0) << "FATAL: libsodium failed to initialize.";
+    EncryptionManager encManager;
+    void SetUp() override{
+        ASSERT_TRUE(encManager.initialize())<<"EncryptionManager failed to initialize Libsodium.";
     }
 };
 
-TEST_F(CryptoTest, SymmetricEncryptionRoundTrip) {
-    const std::string plaintext = "zero_knowledge_test_payload_01";
+TEST_F(EncryptionManagerTest, EncryptDecryptRoundTrip)
+{
+    const QString originalText = "Zero_Knowledge_Vault_Payload_2026";
+    const char* rawPwd = "StrongTestPassword123!";
+    const SecureString dummyPassword(rawPwd,rawPwd+std::strlen(rawPwd));
 
-    // 1. SECURE ALLOCATION
-    // Keys must live in pinned, non-pageable memory.
-    unsigned char* key = static_cast<unsigned char*>(sodium_malloc(crypto_secretbox_KEYBYTES));
-    ASSERT_NE(key, nullptr) << "Memory allocation for crypto key failed.";
-    crypto_secretbox_keygen(key);
+    const QByteArray salt = encManager.generateSalt();
+    ASSERT_FALSE(salt.isEmpty())<<"Salt generation failed. Returned empty array.";
 
-    // 2. NONCE GENERATION
-    std::vector<unsigned char> nonce(crypto_secretbox_NONCEBYTES);
-    randombytes_buf(nonce.data(), nonce.size());
+    const SecureVector masterKey = encManager.deriveMasterKey(dummyPassword,salt);
+    ASSERT_FALSE(masterKey.empty())<<"Argon2id Key derivation failed.";
 
-    // 3. ENCRYPTION
-    // Ciphertext size requires room for the MAC
-    std::vector<unsigned char> ciphertext(plaintext.length() + crypto_secretbox_MACBYTES);
-    int encrypt_status = crypto_secretbox_easy(
-        ciphertext.data(),
-        reinterpret_cast<const unsigned char*>(plaintext.data()),
-        plaintext.length(),
-        nonce.data(),
-        key
-        );
-    ASSERT_EQ(encrypt_status, 0) << "Encryption process failed.";
+    const QByteArray encryptedData = encManager.encryptString(originalText,masterKey);
+    ASSERT_FALSE(encryptedData.isEmpty())<< "Encryption returned empty data.";
 
-    // 4. DECRYPTION
-    std::vector<unsigned char> decryptedtext(plaintext.length());
-    int decrypt_status = crypto_secretbox_open_easy(
-        decryptedtext.data(),
-        ciphertext.data(),
-        ciphertext.size(),
-        nonce.data(),
-        key
-        );
+    ASSERT_NE(encryptedData, originalText.toUtf8()) << "FATAL: Encrypted data matches plaintext!";
 
-    // If this fails, either the ciphertext was tampered with or you messed up the pointers
-    ASSERT_EQ(decrypt_status, 0) << "Decryption rejected: MAC validation failed or data corrupted.";
+    const QString resultText = encManager.decryptString(encryptedData,masterKey);
+    ASSERT_FALSE(resultText.isEmpty())<< "Decryption rejected: MAC validation failed or data corrupted.";
 
-    std::string result(reinterpret_cast<char*>(decryptedtext.data()), decryptedtext.size());
-    EXPECT_EQ(plaintext, result) << "Decrypted payload does not match original plaintext.";
+    EXPECT_EQ(originalText, resultText) << "Decrypted text does not match the original input.";
+}
 
-    // 5. SECURE CLEANUP
-    // If you forget this in your actual wrapper, you leak the master key. Do not forget it.
-    sodium_free(key);
+TEST_F(EncryptionManagerTest, DecryptionFailsOnCorruptedData) {
+    const QString originalText = "Sensitive_Data_Do_Not_Leak";
+
+    const char* rawPwd = "StrongTestPassword123!";
+    SecureString dummyPassword(rawPwd, rawPwd + std::strlen(rawPwd));
+
+    QByteArray salt = encManager.generateSalt();
+    SecureVector masterKey = encManager.deriveMasterKey(dummyPassword, salt);
+
+    QByteArray encryptedData = encManager.encryptString(originalText, masterKey);
+    ASSERT_FALSE(encryptedData.isEmpty());
+
+    // Attack Case: Flip single bit in the ciphertext to simulate tampering or disk corruption
+    encryptedData[0] = encryptedData[0] ^ 0x01;
+
+    // Defensive Pact: Decryption must reject the tampered payload
+    QString resultText = encManager.decryptString(encryptedData, masterKey);
+
+    EXPECT_TRUE(resultText.isEmpty()) << "SECURITY FLAW: Decryption succeeded on tampered ciphertext!";
 }

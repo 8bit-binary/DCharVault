@@ -225,4 +225,14 @@ if(BUILD_TESTS)
 
     include(GoogleTest)
     gtest_discover_tests(test_crypto DISCOVERY_MODE PRE_TEST)
+
+    if(WIN32)
+        add_custom_command(TARGET test_crypto POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${SODIUM_ROOT}/bin/libsodium.dll"
+            $<TARGET_FILE_DIR:test_crypto>
+        )
+    endif()
+
+
 endif()
