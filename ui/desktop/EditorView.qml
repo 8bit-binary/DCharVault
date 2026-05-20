@@ -21,6 +21,8 @@ Page {
         editorArea.forceActiveFocus()
     }
 
+    property bool isDirtyState: false
+    property bool isPendingNavigation: false
     property int colorMode: 0 // 0 == text color, 1 == highlight color
     property int currentEntryId: -1
     property string originalTitle: ""
@@ -29,6 +31,23 @@ Page {
     property alias entryTitle: titleField.text
     property alias entryContent: editorArea.text
     property alias readOnly: editorArea.readOnly
+
+    function tryNavigateTo(entryId, entryTitle) {
+        if (isDirtyState) {
+            unsavedChangesDialog.pendingTargetId = entryId
+            unsavedChangesDialog.pendingTargetTitle = entryTitle
+            unsavedChangesDialog.open()
+        } else {
+            loadEntry(entryId, entryTitle)
+        }
+    }
+    function loadEntry(entryId, entryTitle) {
+        root.currentEntryId = entryId
+        root.entryTitle = entryTitle
+        root.entryContent = diaryViewModel.loadEntryContent(entryId)
+        editorArea.textDocument.modified = false
+        root.isDirtyState = false
+    }
 
     Connections {
         target: diaryViewModel
@@ -39,6 +58,12 @@ Page {
             editorArea.textDocument.modified = false
             titleField.text = finalizeTitle
             originalTitle = finalizeTitle
+            root.isDirtyState = false
+            if (root.isPendingNavigation) {
+                root.isPendingNavigation = false
+                loadEntry(unsavedChangesDialog.pendingTargetId,
+                          unsavedChangesDialog.pendingTargetTitle)
+            }
         }
         function onEntrySaveFailed(errorMessage) {
             console.error("QML Error: " + errorMessage)
@@ -50,6 +75,7 @@ Page {
             titleField.text = ""
             editorArea.text = ""
             editorArea.textDocument.modified = false
+            root.isDirtyState = false
         }
     }
 
@@ -67,6 +93,7 @@ Page {
                                         editorArea.text)
             originalTitle = titleField.text
             editorArea.textDocument.modified = false
+            root.isDirtyState = false
         }
     }
     Action {
@@ -202,6 +229,34 @@ Page {
         }
     }
     MessageDialog {
+        id: unsavedChangesDialog
+        title: "Unsavd Changes"
+        text: "You have unsaved Changes in this page!"
+        informativeText: "Do you want to save them before leaving"
+        buttons: MessageDialog.Save | MessageDialog.Discard | MessageDialog.Cancel
+
+        // for remembering of user click on sidebar
+        property int pendingTargetId: -1
+        property string pendingTargetTitle: ""
+        onButtonClicked: function (button, role) {
+            if (button === MessageDialog.Save) {
+                console.log("QML: User chose to SAVE before navigating.")
+                root.isPendingNavigation = true
+                saveAction.trigger()
+            } else if (button === MessageDialog.Discard) {
+                console.log("QML: User chose to DISCARD changes.")
+                root.isDirtyState = false
+                loadEntry(pendingTargetId, pendingTargetTitle)
+            } else if (button === MessageDialog.Cancel) {
+                console.log("QML: User canceled navigation.")
+                // do nothing close this dialog
+                pendingTargetId = -1
+                pendingTargetTitle = ""
+            }
+        }
+    }
+
+    MessageDialog {
         id: deleteConfirmDialog
         title: "Delete Entry"
         text: "Are you sure you want to permanently delete this page?"
@@ -270,6 +325,7 @@ Page {
                 function moveFocusEditor() {
                     editorArea.focus = true
                 }
+                onTextChanged: root.isDirtyState = true
             }
 
             Rectangle {
@@ -310,6 +366,7 @@ Page {
                 persistentSelection: true
                 color: ThemeManager.textMain
 
+                onTextChanged: root.isDirtyState = true
                 onCursorPositionChanged: {
                     if (editorArea.inputMethodComposing)
                         return

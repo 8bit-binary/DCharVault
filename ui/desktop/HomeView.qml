@@ -23,10 +23,7 @@ Page {
             SplitView.maximumWidth: parent.width
             onEntrySelected: function (entryId, entryTitle) {
                 console.log("QML: User clicked entry ID:", entryId)
-                mainEditor.currentEntryId = entryId
-                mainEditor.entryTitle = entryTitle
-                let secretContent = diaryViewModel.loadEntryContent(entryId)
-                mainEditor.entryContent = secretContent
+                mainEditor.tryNavigateTo(entryId, entryTitle)
             }
             onCreateClicked: {
                 console.log("QML: Preparing empty editor for new note")
