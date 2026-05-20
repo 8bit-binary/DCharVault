@@ -104,6 +104,23 @@ QByteArray DatabaseManager::getConfigValue(const QString &key) const {
     return QByteArray();
 }
 
+QString DatabaseManager::getJournalName() const {
+    QSqlQuery query;
+    query.prepare("SELECT journal_name FROM journal_meta WHERE id = 1");
+
+    if(!query.exec()){
+        qCritical() << "Failed to execute get journal name: " << query.lastError().text() << "\n";
+        return QString();
+    }
+
+    if (query.next()) {
+        return query.value(0).toString();
+    }
+
+    qWarning() << "No journal name found in database.";
+    return QString();
+}
+
 QByteArray DatabaseManager::getEntryContent(int64_t id) const{
     QSqlQuery query;
     query.prepare("SELECT encrypted_content FROM journal WHERE id = :id");

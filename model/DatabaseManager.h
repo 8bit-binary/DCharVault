@@ -32,6 +32,7 @@ public:
     bool setSpecialStatus(const QString& status);
 
     QByteArray getConfigValue(const QString& key) const;
+    QString getJournalName() const;
     std::vector<EntryMetadata> getAllEntriesMetadata();
     QByteArray getEntryContent(int64_t id) const;
     QByteArray getEntryTitle(int64_t id) const;
