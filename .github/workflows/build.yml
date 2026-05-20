@@ -33,10 +33,18 @@ jobs:
         cache: true
 
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
 
-    - name: Build
+    - name: Build Application
       run: cmake --build build --config Release
+
+    - name: Build Core Tests
+      run: cmake --build build --target dcharvault_tests --config Release
+
+    - name: Execute Tests (CTest)
+      working-directory: build
+      # Run tests in parallel (-j4) and output verbose logs if they fail
+      run: ctest -C Release -j4 --output-on-failure
 
     - name: Package Linux App (Manual Bundle)
       run: |
