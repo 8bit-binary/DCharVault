@@ -213,24 +213,25 @@ if(BUILD_TESTS)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
 
-    add_executable(test_crypto tests/test_crypto.cpp)
+    add_executable(DCharVault_tests tests/test_crypto.cpp tests/test_database.cpp)
 
-    target_link_libraries(test_crypto
+    target_link_libraries(DCharVault_tests
         PRIVATE
         gtest_main
         DCharVault_Core
         ${SODIUM_LIB}
         Qt6::Core
+        Qt6::Sql
     )
 
     include(GoogleTest)
-    gtest_discover_tests(test_crypto DISCOVERY_MODE PRE_TEST)
+    gtest_discover_tests(DCharVault_tests DISCOVERY_MODE PRE_TEST)
 
     if(WIN32)
-        add_custom_command(TARGET test_crypto POST_BUILD
+        add_custom_command(TARGET DCharVault_tests POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${SODIUM_ROOT}/bin/libsodium.dll"
-            $<TARGET_FILE_DIR:test_crypto>
+            $<TARGET_FILE_DIR:DCharVault_tests>
         )
     endif()
 
