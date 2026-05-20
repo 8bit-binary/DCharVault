@@ -39,7 +39,7 @@ jobs:
       run: cmake --build build --config Release
 
     - name: Build Core Tests
-      run: cmake --build build --target dcharvault_tests --config Release
+      run: cmake --build build --target DCharVault_tests --config Release
 
     - name: Execute Tests (CTest)
       working-directory: build
