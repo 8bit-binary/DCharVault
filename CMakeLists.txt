@@ -213,11 +213,11 @@ if(BUILD_TESTS)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
 
-    add_executable(DCharVault_tests tests/test_crypto.cpp tests/test_database.cpp)
+    add_executable(DCharVault_tests tests/main_test.cpp tests/test_crypto.cpp tests/test_database.cpp)
 
     target_link_libraries(DCharVault_tests
         PRIVATE
-        gtest_main
+        gtest
         DCharVault_Core
         ${SODIUM_LIB}
         Qt6::Core
