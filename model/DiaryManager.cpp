@@ -31,7 +31,7 @@ bool DiaryManager::isVaultOpened() const{
         return DiaryError::CryptoError;
     }
 
-    const QString saltKey = "crypto_salt"; // todo: change to dynamic instead of hardcoded
+    const QString saltKey = "crypto_salt";
     QByteArray salt = dbManager.getConfigValue(saltKey);
     if(salt.isEmpty()){
         qDebug()<<"New vault Detected. generating new salt\n";

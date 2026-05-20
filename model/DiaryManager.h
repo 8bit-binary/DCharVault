@@ -99,16 +99,3 @@ private:
 
 #endif
 
-
-/*
-┌───────────────┐
-│ DiaryManager  │   owns entries
-│               │
-│  vector<DiaryEntry>
-│               │
-│  ├── readEntry(id)        -> full entry
-│  ├── create/update/delete
-│  └── readEntrySummaries() -> UI list
-└───────────────┘
-
-*/
