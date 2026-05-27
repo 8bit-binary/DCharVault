@@ -73,6 +73,8 @@ public:
     [[nodiscard]] DiaryError updateEntry(const int64_t id, const QString& title, const QString& content);
     [[nodiscard]] DiaryError deleteEntry(const int64_t id);
 
+    [[nodiscard]] DiaryError lockVault() const;
+
     bool isVaultOpened() const;
 
 private:

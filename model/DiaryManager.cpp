@@ -15,6 +15,10 @@ DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
     return &entries[it->second];
 }
 
+[[nodiscard]] DiaryError DiaryManager::lockVault() const{
+    return DiaryError::None;
+}
+
 bool DiaryManager::isVaultOpened() const{
     return !masterKey.empty();
 }
