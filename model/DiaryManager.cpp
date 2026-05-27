@@ -15,7 +15,21 @@ DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
     return &entries[it->second];
 }
 
-[[nodiscard]] DiaryError DiaryManager::lockVault() const{
+[[nodiscard]] DiaryError DiaryManager::lockVault(){
+    if(!isVaultOpened()){ return DiaryError::None; }
+
+    masterKey.clear();
+    masterKey.shrink_to_fit();
+
+    for(auto& entry : entries){
+        sodium_memzero(entry.title.data(), entry.title.size());
+        sodium_memzero(entry.content.data(), entry.content.size());
+        entry.title.clear();
+        entry.content.clear();
+    }
+    entries.clear();
+    idToIndex.clear();
+
     return DiaryError::None;
 }
 
