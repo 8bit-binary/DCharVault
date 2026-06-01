@@ -18,17 +18,25 @@ DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
 [[nodiscard]] DiaryError DiaryManager::lockVault(){
     if(!isVaultOpened()){ return DiaryError::None; }
 
+    sodium_memzero(masterKey.data(), masterKey.capacity());
     masterKey.clear();
     masterKey.shrink_to_fit();
+    SecureVector().swap(masterKey);
 
     for(auto& entry : entries){
-        sodium_memzero(entry.title.data(), entry.title.size());
-        sodium_memzero(entry.content.data(), entry.content.size());
+        // Expand string size to its full capacity so data() covers all allocated memory safely
+        entry.title.resize(entry.title.capacity(), '\0');
+        entry.content.resize(entry.content.capacity(), '\0');
+
+        sodium_memzero(entry.title.data(), entry.title.capacity());
+        sodium_memzero(entry.content.data(), entry.content.capacity());
+
         entry.title.clear();
         entry.content.clear();
     }
-    entries.clear();
-    idToIndex.clear();
+
+    std::vector<DiaryEntry>().swap(entries);
+    std::unordered_map<int64_t, size_t>().swap(idToIndex);
 
     return DiaryError::None;
 }
