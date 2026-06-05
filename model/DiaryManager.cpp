@@ -45,6 +45,31 @@ bool DiaryManager::isVaultOpened() const{
     return !masterKey.empty();
 }
 
+[[nodiscard]] DiaryError DiaryManager::saveSessionTimeout(uint32_t seconds)
+{
+    const QString sessionTimeout = "session_timeout";
+    const QByteArray valueBytes = QByteArray::number(seconds);
+    if(!dbManager.setConfigValue(sessionTimeout, valueBytes)){
+        return DiaryError::DatabaseError;
+    }
+    return DiaryError::None;
+}
+uint32_t DiaryManager::loadSessionTimeout() const
+{
+    const QString sessionTimeout = "session_timeout";
+    QByteArray valueBytes = dbManager.getConfigValue(sessionTimeout);
+    if (valueBytes.isEmpty()) {
+        return 600; // hardcoded: Default to 10 minutes
+    }
+    bool isValidSeconds;
+    uint32_t seconds = valueBytes.toUInt(&isValidSeconds);
+    if (!isValidSeconds) {
+        qWarning() << "Invalid session timeout in database. Using default.";
+        return 600; // hardcoded: Default to 10 minutes
+    }
+    return seconds;
+}
+
 [[nodiscard]] DiaryError DiaryManager::openDiary(const QString& journalName, const QString& path, const SecureString& password) {
     if(!dbManager.databaseInit(path)){
         return DiaryError::DatabaseOpenError;

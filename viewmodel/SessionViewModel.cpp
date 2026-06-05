@@ -5,7 +5,7 @@
 SessionViewModel::SessionViewModel(DiaryManager *diaryManager, QObject *parent)
   : QObject(parent)
     , m_diaryManager(diaryManager)
-    ,/* m_session(diaryManager->loadSessionTimeout()) // initialize with saved value  to do : define first in dairyManager*/
+    , m_session(diaryManager->loadSessionTimeout()) // initialize with saved value 600(10 mins)
     , m_tickTimer(this)
 {
     m_tickTimer.setTimerType(Qt::VeryCoarseTimer); // battery friendly
@@ -41,7 +41,10 @@ void SessionViewModel::onUnlockSuccess() {
 
 void SessionViewModel::setTimeoutSeconds(uint32_t seconds) {
     m_session.setTimeoutSeconds(seconds);
-    // m_diaryManager->saveSessionTimeout(seconds); TODO task in DiaryManager:
+    const DiaryError error = m_diaryManager->saveSessionTimeout(seconds);
+    if (error != DiaryError::None) {
+        // future todo: log or emit a warning signal later for user or testing
+    }
     emit timeLimitChanged();
 }
 

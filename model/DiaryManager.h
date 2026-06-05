@@ -67,8 +67,8 @@ public:
     QString readEntryTitle(int64_t id);
     // const std::vector<DiaryEntry>& readEntries() const noexcept;
     const DiaryEntry* readEntry(const int64_t id) const noexcept;
-    // This is "Handle-based access" and is much safer for vectors.
-    //[[nodiscard]] : if someone ignore return value error then warn them!!
+
+
     [[nodiscard]] int64_t createEntry(const QString& title, const QString& content);
     [[nodiscard]] DiaryError updateEntry(const int64_t id, const QString& title, const QString& content);
     [[nodiscard]] DiaryError deleteEntry(const int64_t id);
@@ -76,6 +76,10 @@ public:
     [[nodiscard]] DiaryError lockVault();
 
     bool isVaultOpened() const;
+
+    [[nodiscard]] DiaryError saveSessionTimeout(uint32_t seconds);
+    uint32_t loadSessionTimeout() const;
+
 
 private:
     QString journal_name; 
