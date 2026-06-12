@@ -9,6 +9,7 @@
 #include"viewmodel/SecurePasswordInput.h"
 #include "viewmodel/LoginViewModel.h"
 #include "viewmodel/DiaryViewModel.h"
+#include "viewmodel/SessionViewModel.h"
 #include "viewmodel/DiaryListModel.h"
 
 #ifdef Q_OS_WIN
@@ -33,10 +34,20 @@ int main(int argc, char *argv[])
 
     // Boot Backend
     DiaryManager diaryManager;
+
     // Boot View Model
     LoginViewModel loginVM(diaryManager);
     DiaryViewModel diaryVM(diaryManager);
+    SessionViewModel diarySM(&diaryManager);
     DiaryListModel diaryListModel(diaryManager);
+
+    // session wiring
+    QObject::connect(&loginVM, &LoginViewModel::loginSuccess,
+                     &diarySM, &SessionViewModel::onVaultOpened);
+
+    QObject::connect(&app, &QGuiApplication::applicationStateChanged,
+                     &diarySM, &SessionViewModel::onApplicationStateChanged);
+
 
     // UI LAUNCHER
     QQuickStyle::setStyle("Basic");
@@ -50,7 +61,9 @@ int main(int argc, char *argv[])
     // pointing directly to your C++ loginVM object.
     engine.rootContext()->setContextProperty("loginViewModel", &loginVM);
     engine.rootContext()->setContextProperty("diaryViewModel",&diaryVM);
+    engine.rootContext()->setContextProperty("diarySessionModel",&diarySM);
     engine.rootContext()->setContextProperty("diaryListModel",&diaryListModel);
+
 
     engine.loadFromModule("DCharVault", "Main");
     // Check if it loaded

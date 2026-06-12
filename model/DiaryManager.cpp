@@ -15,8 +15,71 @@ DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
     return &entries[it->second];
 }
 
+[[nodiscard]] DiaryError DiaryManager::lockVault(){
+    if(!isVaultOpened()){ return DiaryError::None; }
+
+    sodium_memzero(masterKey.data(), masterKey.capacity());
+    masterKey.clear();
+    masterKey.shrink_to_fit();
+    SecureVector().swap(masterKey);
+
+    for(auto& entry : entries){
+        // Expand string size to its full capacity so data() covers all allocated memory safely
+        entry.title.resize(entry.title.capacity(), '\0');
+        entry.content.resize(entry.content.capacity(), '\0');
+
+        sodium_memzero(entry.title.data(), entry.title.capacity());
+        sodium_memzero(entry.content.data(), entry.content.capacity());
+
+        entry.title.clear();
+        entry.content.clear();
+    }
+
+    std::vector<DiaryEntry>().swap(entries);
+    std::unordered_map<int64_t, size_t>().swap(idToIndex);
+
+    return DiaryError::None;
+}
+
 bool DiaryManager::isVaultOpened() const{
     return !masterKey.empty();
+}
+
+[[nodiscard]] DiaryError DiaryManager::saveSessionTimeout(uint32_t seconds)
+{
+    if (!isVaultOpened()) {
+        return DiaryError::MasterKeyNotFound;
+    }
+    const QString sessionTimeout = "session_timeout";
+    const QString sessionSecs = QString::number(seconds);
+    const QByteArray valueBytes = encManager.encryptString(sessionSecs,masterKey);
+    if (valueBytes.isEmpty()) {
+        return DiaryError::EncryptionFailed;
+    }
+
+    if(!dbManager.setConfigValue(sessionTimeout, valueBytes)){
+        return DiaryError::DatabaseError;
+    }
+    return DiaryError::None;
+}
+uint32_t DiaryManager::loadSessionTimeout() const
+{
+    if (!isVaultOpened()) {
+        return 420; // no key yet — caller re-queries via onVaultOpened()
+    }
+    const QString sessionTimeout = "session_timeout";
+    const QByteArray encSessionBytes = dbManager.getConfigValue(sessionTimeout);
+    const QString valueBytes = encManager.decryptString(encSessionBytes,masterKey);
+    if (valueBytes.isEmpty()) {
+        return 420; // hardcoded: Default to 10 minutes
+    }
+    bool isValidSeconds;
+    uint32_t seconds = valueBytes.toUInt(&isValidSeconds);
+    if (!isValidSeconds) {
+        qWarning() << "Invalid session timeout in database. Using default.";
+        return 420; // hardcoded: Default to 10 minutes
+    }
+    return seconds;
 }
 
 [[nodiscard]] DiaryError DiaryManager::openDiary(const QString& journalName, const QString& path, const SecureString& password) {
