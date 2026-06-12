@@ -66,7 +66,7 @@ QByteArray EncryptionManager::encryptString(const QString &inputString, const Se
     return nonce + cipherText;
 }
 
-QString EncryptionManager::decryptString(const QByteArray &inputBytes, const SecureVector &masterKey){
+QString EncryptionManager::decryptString(const QByteArray &inputBytes, const SecureVector &masterKey) const{
     // It must contain at least a Nonce (24) and a MAC Tag (16).
     if (inputBytes.size() < crypto_aead_xchacha20poly1305_ietf_NPUBBYTES + crypto_aead_xchacha20poly1305_ietf_ABYTES) {
         qCritical() << "Fatal: Ciphertext is too short. Data is corrupted.";

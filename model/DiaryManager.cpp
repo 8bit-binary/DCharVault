@@ -47,8 +47,16 @@ bool DiaryManager::isVaultOpened() const{
 
 [[nodiscard]] DiaryError DiaryManager::saveSessionTimeout(uint32_t seconds)
 {
+    if (!isVaultOpened()) {
+        return DiaryError::MasterKeyNotFound;
+    }
     const QString sessionTimeout = "session_timeout";
-    const QByteArray valueBytes = QByteArray::number(seconds);
+    const QString sessionSecs = QString::number(seconds);
+    const QByteArray valueBytes = encManager.encryptString(sessionSecs,masterKey);
+    if (valueBytes.isEmpty()) {
+        return DiaryError::EncryptionFailed;
+    }
+
     if(!dbManager.setConfigValue(sessionTimeout, valueBytes)){
         return DiaryError::DatabaseError;
     }
@@ -56,8 +64,12 @@ bool DiaryManager::isVaultOpened() const{
 }
 uint32_t DiaryManager::loadSessionTimeout() const
 {
+    if (!isVaultOpened()) {
+        return 600; // no key yet — caller re-queries via onVaultOpened()
+    }
     const QString sessionTimeout = "session_timeout";
-    QByteArray valueBytes = dbManager.getConfigValue(sessionTimeout);
+    const QByteArray encSessionBytes = dbManager.getConfigValue(sessionTimeout);
+    const QString valueBytes = encManager.decryptString(encSessionBytes,masterKey);
     if (valueBytes.isEmpty()) {
         return 600; // hardcoded: Default to 10 minutes
     }
