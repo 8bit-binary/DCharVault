@@ -12,7 +12,7 @@ class SessionViewModel : public QObject {
 
     // Read-only from QML — only C++ core can change it
     //         type          getter/method   signal: that fires when value changes
-    Q_PROPERTY(bool isLocked READ isLocked NOTIFY sessionLocked)
+    Q_PROPERTY(bool isLocked READ isLocked NOTIFY lockStateChanged)
 
     // Read-Write direct from QML -- settings screen can change it
     Q_PROPERTY(uint32_t timeoutSeconds READ timeoutSeconds
@@ -31,8 +31,10 @@ public:
 
 public slots:
     void onApplicationStateChanged(Qt::ApplicationState state);
+    void onVaultOpened();
 
 signals:
+    void lockStateChanged();
     void sessionLocked();
     void sessionUnlocked();
     void timeLimitChanged();

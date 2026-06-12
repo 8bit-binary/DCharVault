@@ -31,11 +31,13 @@ void SessionViewModel::lockNow() {
         // future todo: log or emit a warning signal later for user or testing
     }
     m_session.lock();
+    emit lockStateChanged();
     emit sessionLocked();
 }
 
 void SessionViewModel::onUnlockSuccess() {
     m_session.unlock();
+    emit lockStateChanged();
     emit sessionUnlocked();
 }
 
@@ -62,4 +64,10 @@ void SessionViewModel::onApplicationStateChanged(Qt::ApplicationState state) {
             lockNow();
         }
     }
+}
+
+void SessionViewModel::onVaultOpened(){
+    const uint32_t saved = m_diaryManager->loadSessionTimeout();
+    m_session.setTimeoutSeconds(saved);
+    emit timeLimitChanged();
 }
