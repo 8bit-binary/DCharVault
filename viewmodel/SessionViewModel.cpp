@@ -1,6 +1,7 @@
 #include"SessionViewModel.h"
 #include "model/DiaryManager.h"
-
+#include <QGuiApplication>
+#include <QEvent>
 
 SessionViewModel::SessionViewModel(DiaryManager *diaryManager, QObject *parent)
   : QObject(parent)
@@ -8,9 +9,23 @@ SessionViewModel::SessionViewModel(DiaryManager *diaryManager, QObject *parent)
     , m_session(diaryManager->loadSessionTimeout()) // initialize with saved value 600(10 mins)
     , m_tickTimer(this)
 {
+    qApp->installEventFilter(this); // hook into absolute root of application
+
     m_tickTimer.setTimerType(Qt::VeryCoarseTimer); // battery friendly
     connect(&m_tickTimer, &QTimer::timeout, this, &SessionViewModel::onTimerTick);
     m_tickTimer.start(30000); // hardcoded: minimum timeout is 60 so 30s is enough at this stage
+}
+
+bool SessionViewModel::eventFilter(QObject *obj, QEvent *event){
+    if (event->type() == QEvent::KeyPress ||
+        event->type() == QEvent::MouseMove ||
+        event->type() == QEvent::MouseButtonPress ||
+        event->type() == QEvent::TouchBegin)
+    {
+        reportActivity();
+    }
+
+    return QObject::eventFilter(obj, event); // returns false to let event continue down to QML normally
 }
 
 bool SessionViewModel::isLocked() const {

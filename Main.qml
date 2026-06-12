@@ -20,21 +20,6 @@ ApplicationWindow {
             anchors.fill: parent
             initialItem: "ui/common/login.qml"
         }
-        MouseArea {
-            anchors.fill: parent
-            propagateComposedEvents: true
-            hoverEnabled: true
-            onPositionChanged: diarySessionModel.reportActivity()
-            onPressed: mouse => {
-                           diarySessionModel.reportActivity()
-                           mouse.accepted = false
-            }
-        }
-
-        Keys.onPressed: (event) => {
-                            diarySessionModel.reportActivity()
-                            event.accepted = false
-        }
     }
 
     Connections {
@@ -46,9 +31,12 @@ ApplicationWindow {
                               StackView.PushTransition)
         }
     }
-    function onVaultLocked() {
-        console.log("Main.qml: Vault locked. Sliding back to Login.")
-        // slide back to the login screen again and destroy the HomeView (clearing memory).
-        stackView.replace("ui/common/login.qml", StackView.PopTransition)
+    Connections {
+        target: diarySessionModel
+        function onSessionLocked() {
+            console.log("Main.qml: SECURITY TIMEOUT. Purging UI state.")
+            startView.replace("ui/common/login.qml", StackView.PopTransition)
+            gc()
+        }
     }
 }

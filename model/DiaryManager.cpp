@@ -65,19 +65,19 @@ bool DiaryManager::isVaultOpened() const{
 uint32_t DiaryManager::loadSessionTimeout() const
 {
     if (!isVaultOpened()) {
-        return 600; // no key yet — caller re-queries via onVaultOpened()
+        return 420; // no key yet — caller re-queries via onVaultOpened()
     }
     const QString sessionTimeout = "session_timeout";
     const QByteArray encSessionBytes = dbManager.getConfigValue(sessionTimeout);
     const QString valueBytes = encManager.decryptString(encSessionBytes,masterKey);
     if (valueBytes.isEmpty()) {
-        return 600; // hardcoded: Default to 10 minutes
+        return 420; // hardcoded: Default to 10 minutes
     }
     bool isValidSeconds;
     uint32_t seconds = valueBytes.toUInt(&isValidSeconds);
     if (!isValidSeconds) {
         qWarning() << "Invalid session timeout in database. Using default.";
-        return 600; // hardcoded: Default to 10 minutes
+        return 420; // hardcoded: Default to 10 minutes
     }
     return seconds;
 }

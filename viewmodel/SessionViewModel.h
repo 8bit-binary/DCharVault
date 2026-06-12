@@ -20,6 +20,7 @@ class SessionViewModel : public QObject {
 
 public:
     explicit SessionViewModel(DiaryManager* diaryManager, QObject* parent = nullptr);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
     bool isLocked() const;
     uint32_t timeoutSeconds() const;
