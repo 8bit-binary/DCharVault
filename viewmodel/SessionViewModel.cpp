@@ -1,4 +1,4 @@
-#include"SessionViewModel.h"
+#include "SessionViewModel.h"
 #include "model/DiaryManager.h"
 #include <QGuiApplication>
 #include <QEvent>
@@ -6,7 +6,7 @@
 SessionViewModel::SessionViewModel(DiaryManager *diaryManager, QObject *parent)
   : QObject(parent)
     , m_diaryManager(diaryManager)
-    , m_session(diaryManager->loadSessionTimeout()) // initialize with saved value 600(10 mins)
+    , m_session(diaryManager->loadSessionTimeout()) // initialize with saved value 420(7mins)
     , m_tickTimer(this)
 {
     qApp->installEventFilter(this); // hook into absolute root of application

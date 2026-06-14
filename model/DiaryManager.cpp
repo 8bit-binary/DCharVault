@@ -9,6 +9,10 @@
 #include<QString>
 #include"TitleGenerators.h"
 
+namespace DefaultsDM_Values{
+    constexpr uint32_t DEFAULT_SESSION_TIMEOUT_SECONDS = 10; // 7mins default timeout session period
+}
+
 DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
     auto it = idToIndex.find(id);
     if(it == idToIndex.end()) return nullptr;
@@ -65,19 +69,19 @@ bool DiaryManager::isVaultOpened() const{
 uint32_t DiaryManager::loadSessionTimeout() const
 {
     if (!isVaultOpened()) {
-        return 420; // no key yet — caller re-queries via onVaultOpened()
+        return DefaultsDM_Values::DEFAULT_SESSION_TIMEOUT_SECONDS;
     }
     const QString sessionTimeout = "session_timeout";
     const QByteArray encSessionBytes = dbManager.getConfigValue(sessionTimeout);
     const QString valueBytes = encManager.decryptString(encSessionBytes,masterKey);
     if (valueBytes.isEmpty()) {
-        return 420; // hardcoded: Default to 10 minutes
+        return DefaultsDM_Values::DEFAULT_SESSION_TIMEOUT_SECONDS;
     }
     bool isValidSeconds;
     uint32_t seconds = valueBytes.toUInt(&isValidSeconds);
     if (!isValidSeconds) {
         qWarning() << "Invalid session timeout in database. Using default.";
-        return 420; // hardcoded: Default to 10 minutes
+        return DefaultsDM_Values::DEFAULT_SESSION_TIMEOUT_SECONDS;
     }
     return seconds;
 }
