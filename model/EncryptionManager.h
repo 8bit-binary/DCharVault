@@ -12,17 +12,17 @@ class EncryptionManager{
 public:
     EncryptionManager();
 
-    bool initialize();
+    bool initialize() const;
 
-    QByteArray generateSalt();
+    QByteArray generateSalt() const;
 
-    SecureVector deriveMasterKey(const SecureString& password, const QByteArray& salt);
+    SecureVector deriveMasterKey(const SecureString& password, const QByteArray& salt) const;
 
-    QByteArray encryptString(const QString& inputString, const SecureVector& masterKey);
+    QByteArray encryptString(const QString& inputString, const SecureVector& masterKey) const;
     QString decryptString(const QByteArray& inputBytes, const SecureVector& masterkey) const;
 
     // generates secure randombytes
-    QByteArray generateRandomBytes(size_t length = 32);
+    QByteArray generateRandomBytes(size_t length = 32) const;
 
 private:
 };

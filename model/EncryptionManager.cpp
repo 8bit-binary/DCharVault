@@ -4,7 +4,8 @@
 
 EncryptionManager::EncryptionManager(){}
 
-bool EncryptionManager::initialize(){
+bool EncryptionManager::initialize() const
+{
     if(sodium_init()<0){
         qCritical()<<"Fatal: Library Sodium.h couldn't be initialized.\n";
         return false;
@@ -13,20 +14,21 @@ bool EncryptionManager::initialize(){
     return true;
 }
 
-QByteArray EncryptionManager::generateSalt(){
+QByteArray EncryptionManager::generateSalt() const
+{
     QByteArray salt(crypto_pwhash_SALTBYTES,Qt::Uninitialized);
     randombytes_buf(salt.data(),salt.size());
     return salt;
 }
 
-QByteArray EncryptionManager::generateRandomBytes(size_t length){
+QByteArray EncryptionManager::generateRandomBytes(size_t length) const{
     QByteArray buffer;
     buffer.resize(length);
     randombytes_buf(buffer.data(),length);
     return buffer;
 }
 
-SecureVector EncryptionManager::deriveMasterKey(const SecureString &password, const QByteArray &salt)
+SecureVector EncryptionManager::deriveMasterKey(const SecureString &password, const QByteArray &salt) const
 {
     SecureVector key(crypto_aead_xchacha20poly1305_ietf_KEYBYTES);
     if(crypto_pwhash(key.data(),key.size(),
@@ -42,7 +44,8 @@ SecureVector EncryptionManager::deriveMasterKey(const SecureString &password, co
     return key;
 }
 
-QByteArray EncryptionManager::encryptString(const QString &inputString, const SecureVector &masterKey) {
+QByteArray EncryptionManager::encryptString(const QString &inputString, const SecureVector &masterKey) const
+{
     QByteArray utf8String = inputString.toUtf8();
 
     QByteArray nonce(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES, Qt::Uninitialized);
@@ -66,7 +69,8 @@ QByteArray EncryptionManager::encryptString(const QString &inputString, const Se
     return nonce + cipherText;
 }
 
-QString EncryptionManager::decryptString(const QByteArray &inputBytes, const SecureVector &masterKey) const{
+QString EncryptionManager::decryptString(const QByteArray &inputBytes, const SecureVector &masterKey) const
+{
     // It must contain at least a Nonce (24) and a MAC Tag (16).
     if (inputBytes.size() < crypto_aead_xchacha20poly1305_ietf_NPUBBYTES + crypto_aead_xchacha20poly1305_ietf_ABYTES) {
         qCritical() << "Fatal: Ciphertext is too short. Data is corrupted.";
