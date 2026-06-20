@@ -118,7 +118,7 @@ Item {
                         radius: ThemeManager.radiusDefault
                         border.color: noteList.currentIndex === index ? ThemeManager.colorAccent : ThemeManager.lineBorder
                         border.width: noteList.currentIndex === index ? 2 : 1
-                        color: noteList.currentIndex === index ? ThemeManager.surfaceElevated : (delegateMouseArea.containsMouse ? Qt.lighter(ThemeManager.bgCard, 1.05) : ThemeManager.bgCard)
+                        color: noteList.currentIndex === index ? ThemeManager.surfaceElevated : (delegateMouseArea.containsMouse ? ThemeManager.bgButtonHover : ThemeManager.bgCard)
                         Behavior on color { ColorAnimation { duration: 150 } }
 
                         ColumnLayout {
@@ -208,7 +208,7 @@ Item {
                         Layout.preferredHeight: ThemeManager.controlHeight
 
                         background: Rectangle {
-                            color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.surfaceElevated : ThemeManager.bgButton)
+                            color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton)
                             radius: ThemeManager.radiusPill
                             border.color: ThemeManager.lineBorder
                             Behavior on color { ColorAnimation { duration: 150 } }
