@@ -131,15 +131,15 @@ Page {
     Action {
         id: cutAction
         text: "Cut"
-        shortcut: StandardKey.Cut // ctrl+X
-        enabled: editorArea.selectedText.length > 0
+        shortcut: StandardKey.Cut // ctrl+X0
+        enabled: editorArea.selectionEnd !== editorArea.selectionStart
         onTriggered: editorArea.cut()
     }
     Action {
         id: copyAction
         text: "Copy"
         shortcut: StandardKey.Copy // ctrl+C
-        enabled: editorArea.selectedText.length > 0
+        enabled: editorArea.selectionEnd !== editorArea.selectionStart
         onTriggered: editorArea.copy()
     }
     Action {
@@ -215,6 +215,11 @@ Page {
         onTriggered: editorArea.cursorSelection.font.underline = checked
     }
 
+    TextHighlighter {
+        id: textHighlighter
+        textDocument: editorArea.textDocument
+    }
+
     ColorDialog {
         id: colorPickerDialog
         title: root.colorMode === 0 ? "Select Text Color" : "Select Highlighter Color"
@@ -223,7 +228,9 @@ Page {
             if (colorMode == 0) {
                 editorArea.cursorSelection.color = selectedColor
             } else {
-                editorArea.cursorSelection.font.backgroundColor = selectedColor
+                textHighlighter.applyHighlight(editorArea.selectionStart,
+                                               editorArea.selectionEnd,
+                                               selectedColor)
             }
             editorArea.forceActiveFocus()
         }

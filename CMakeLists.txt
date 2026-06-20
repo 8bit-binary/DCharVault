@@ -162,6 +162,7 @@ qt_add_qml_module(appDCharVault
         viewmodel/DiaryViewModel.h
         viewmodel/ClipboardSanitizer.h
         viewmodel/SessionViewModel.h
+        viewmodel/TextHighlighter.h
 
         viewmodel/LoginViewModel.cpp
         viewmodel/DiaryViewModel.cpp
@@ -169,7 +170,12 @@ qt_add_qml_module(appDCharVault
         viewmodel/SecurePasswordInput.cpp
         viewmodel/ClipboardSanitizer.cpp
         viewmodel/SessionViewModel.cpp
+        viewmodel/TextHighlighter.cpp
 )
+
+# The auto-generated qmltyperegistrations.cpp does #include <TextHighlighter.h>
+# (angle-bracket), so the viewmodel/ dir must be on the include path.
+target_include_directories(appDCharVault PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/viewmodel)
 
 set_target_properties(appDCharVault PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appDCharVault
