@@ -12,20 +12,24 @@ QtObject {
         }
     }
 
-    readonly property color bgVault: isDark ? "#0D0D0D" : "#F9FAFB"
-    readonly property color bgCard: isDark ? "#1A1A1A" : "#FFFFFF"
-    readonly property color bgInput: isDark ? "#0A0A0A" : "#FFFFFF"
-    readonly property color bgButton: isDark ? "#2D2D2D" : "#F3F4F6"
-    readonly property color bgButtonHover: isDark ? "#3A3A3A" : "#E5E7EB"
+    readonly property color bgVault: isDark ? "#1A0F18" : "#FAF3EC"
+    readonly property color bgCard: isDark ? "#2A1620" : "#FFFFFF"
+    readonly property color bgInput: isDark ? "#1A0F18" : "#FAF3EC"
 
-    readonly property color colorAccent: "#DC4D01"
+    readonly property color surfaceElevated: isDark ? "#34192A" : "#F5E6C8"
+    readonly property color bgButton: surfaceElevated
+    readonly property color bgButtonHover: isDark ? Qt.lighter(surfaceElevated, 1.2) : Qt.darker(surfaceElevated, 1.1)
 
-    readonly property color textMain: isDark ? "#F3F4F6" : "#111827"
-    readonly property color textMuted: isDark ? "#9CA3AF" : "#6B7280"
-    readonly property color lineBorder: isDark ? "#333333" : "#E5E7EB"
+    readonly property color colorAccent: isDark ? "#E0A526" : "#C9881C"
+    readonly property color colorAccentMuted: isDark ? "#B8841C" : "#E8CC8C"
+
+    readonly property color textMain: isDark ? "#F3E9E4" : "#2B1A1F"
+    readonly property color textMuted: isDark ? "#A98B95" : "#8A6A75"
+    readonly property color lineBorder: isDark ? "#4A2438" : "#E5D5C8"
 
     readonly property int marginGlobal: 16
-    readonly property int radiusDefault: 8
+    readonly property int radiusDefault: 12
+    readonly property int radiusPill: 999
     readonly property int controlHeight: 36 // spacious for desktop, perfect for mobile thumbs
 
     function toggleTheme() {

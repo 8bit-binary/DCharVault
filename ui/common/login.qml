@@ -77,8 +77,9 @@ Item {
 
                 background: Rectangle {
                     color: parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton
-                    radius: ThemeManager.radiusDefault
+                    radius: ThemeManager.radiusPill
                     border.color: ThemeManager.lineBorder
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 contentItem: Text {
                     text: parent.text
@@ -127,8 +128,9 @@ Item {
                     color: parent.enabled ? (parent.hovered ? Qt.lighter(
                                                                   ThemeManager.colorAccent,
                                                                   1.1) : ThemeManager.colorAccent) : ThemeManager.bgButton
-                    radius: ThemeManager.radiusDefault
+                    radius: ThemeManager.radiusPill
                     border.color: ThemeManager.lineBorder
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 contentItem: Text {
                     text: parent.text
@@ -150,8 +152,9 @@ Item {
                 text: "Create New Journal"
                 background: Rectangle {
                     color: parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton
-                    radius: ThemeManager.radiusDefault
+                    radius: ThemeManager.radiusPill
                     border.color: ThemeManager.lineBorder
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 contentItem: Text {
                     text: parent.text
@@ -228,8 +231,9 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 background: Rectangle {
                     color: parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton
-                    radius: ThemeManager.radiusDefault
+                    radius: ThemeManager.radiusPill
                     border.color: ThemeManager.lineBorder
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 contentItem: Text {
                     text: parent.text
@@ -258,8 +262,9 @@ Item {
                 flat: true
                 background: Rectangle {
                     color: parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton
-                    radius: ThemeManager.radiusDefault
+                    radius: ThemeManager.radiusPill
                     border.color: ThemeManager.lineBorder
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 contentItem: Text {
                     text: parent.text
