@@ -58,8 +58,9 @@ Item {
                         Layout.preferredHeight: 40
                         // Make the button background transparent so it doesn't create an ugly grey circle
                         background: Rectangle {
-                            color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.bgButton : "transparent")
-                            radius: ThemeManager.radiusDefault
+                            color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.surfaceElevated : "transparent")
+                            radius: ThemeManager.radiusPill
+                            Behavior on color { ColorAnimation { duration: 150 } }
                         }
                         contentItem: Text {
                             text: parent.text
@@ -114,13 +115,11 @@ Item {
                                - ListView.view.rightMargin
                         height: 70
 
-                        // Rounded borders
                         radius: ThemeManager.radiusDefault
-                        border.color: noteList.currentIndex
-                                      === index ? ThemeManager.colorAccent : ThemeManager.lineBorder
+                        border.color: noteList.currentIndex === index ? ThemeManager.colorAccent : ThemeManager.lineBorder
                         border.width: noteList.currentIndex === index ? 2 : 1
-                        color: noteList.currentIndex
-                               === index ? ThemeManager.bgButton : ThemeManager.bgCard
+                        color: noteList.currentIndex === index ? ThemeManager.surfaceElevated : (delegateMouseArea.containsMouse ? ThemeManager.bgButtonHover : ThemeManager.bgCard)
+                        Behavior on color { ColorAnimation { duration: 150 } }
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -150,7 +149,9 @@ Item {
                         }
 
                         MouseArea {
+                            id: delegateMouseArea
                             anchors.fill: parent
+                            hoverEnabled: true
                             onClicked: {
                                 noteList.currentIndex = index
                                 root.entrySelected(model.id, model.title)
@@ -190,9 +191,10 @@ Item {
                         color: ThemeManager.textMain
                         background: Rectangle {
                             color: ThemeManager.bgInput
-                            radius: ThemeManager.radiusDefault
+                            radius: ThemeManager.radiusPill
                             border.color: parent.activeFocus ? ThemeManager.colorAccent : ThemeManager.lineBorder
                             border.width: parent.activeFocus ? 2 : 1
+                            Behavior on border.color { ColorAnimation { duration: 150 } }
                         }
                         verticalAlignment: TextInput.AlignVCenter
                         leftPadding: 12
@@ -205,11 +207,11 @@ Item {
                         Layout.preferredWidth: ThemeManager.controlHeight
                         Layout.preferredHeight: ThemeManager.controlHeight
 
-                        // Custom background to match the aesthetic
                         background: Rectangle {
                             color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton)
-                            radius: ThemeManager.radiusDefault
+                            radius: ThemeManager.radiusPill
                             border.color: ThemeManager.lineBorder
+                            Behavior on color { ColorAnimation { duration: 150 } }
                         }
                         contentItem: Text {
                             text: parent.text

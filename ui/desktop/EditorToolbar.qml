@@ -70,7 +70,7 @@ ToolBar {
                 Layout.preferredWidth: stepperRow.implicitWidth + 8
                 Layout.preferredHeight: 32
                 Layout.alignment: Qt.AlignVCenter
-                radius: ThemeManager.radiusDefault
+                radius: ThemeManager.radiusPill
                 color: ThemeManager.bgInput
                 border.color: ThemeManager.lineBorder
 
