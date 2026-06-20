@@ -10,6 +10,7 @@ Item {
     signal entrySelected(var entryId, string entryTitle)
     signal createClicked
     signal createDiaryClicked
+    signal settingsClicked
 
     // Global margin for consistent alignment
     readonly property int globalMargin: 16
@@ -60,7 +61,11 @@ Item {
                         background: Rectangle {
                             color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.surfaceElevated : "transparent")
                             radius: ThemeManager.radiusPill
-                            Behavior on color { ColorAnimation { duration: 150 } }
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: 150
+                                }
+                            }
                         }
                         contentItem: Text {
                             text: parent.text
@@ -68,6 +73,33 @@ Item {
                             color: ThemeManager.textMain
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+                    // Settings Overrelay
+                    ToolButton {
+                        text: "⚙"
+                        font.pixelSize: 18
+                        Layout.preferredWidth: 40
+                        Layout.preferredHeight: 40
+                        background: Rectangle {
+                            color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.surfaceElevated : "transparent")
+                            radius: ThemeManager.radiusPill
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: 150
+                                }
+                            }
+                        }
+                        contentItem: Text {
+                            text: parent.text
+                            font: parent.font
+                            color: ThemeManager.textMain
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        onClicked: {
+                            root.settingsClicked()
                         }
                     }
                 }
@@ -116,10 +148,15 @@ Item {
                         height: 70
 
                         radius: ThemeManager.radiusDefault
-                        border.color: noteList.currentIndex === index ? ThemeManager.colorAccent : ThemeManager.lineBorder
+                        border.color: noteList.currentIndex
+                                      === index ? ThemeManager.colorAccent : ThemeManager.lineBorder
                         border.width: noteList.currentIndex === index ? 2 : 1
                         color: noteList.currentIndex === index ? ThemeManager.surfaceElevated : (delegateMouseArea.containsMouse ? ThemeManager.bgButtonHover : ThemeManager.bgCard)
-                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: 150
+                            }
+                        }
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -194,7 +231,11 @@ Item {
                             radius: ThemeManager.radiusPill
                             border.color: parent.activeFocus ? ThemeManager.colorAccent : ThemeManager.lineBorder
                             border.width: parent.activeFocus ? 2 : 1
-                            Behavior on border.color { ColorAnimation { duration: 150 } }
+                            Behavior on border.color {
+                                ColorAnimation {
+                                    duration: 150
+                                }
+                            }
                         }
                         verticalAlignment: TextInput.AlignVCenter
                         leftPadding: 12
@@ -211,7 +252,11 @@ Item {
                             color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton)
                             radius: ThemeManager.radiusPill
                             border.color: ThemeManager.lineBorder
-                            Behavior on color { ColorAnimation { duration: 150 } }
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: 150
+                                }
+                            }
                         }
                         contentItem: Text {
                             text: parent.text

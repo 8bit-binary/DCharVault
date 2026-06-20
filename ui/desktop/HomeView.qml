@@ -31,11 +31,19 @@ Page {
                 mainEditor.entryTitle = ""
                 mainEditor.entryContent = ""
             }
+            onSettingsClicked: {
+                settingsOverlay.open()
+            }
         }
 
         EditorView {
             id: mainEditor
             SplitView.fillWidth: true
         }
+    }
+
+    SettingsOverlay {
+        id: settingsOverlay
+        anchors.centerIn: parent
     }
 }

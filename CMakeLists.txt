@@ -135,6 +135,7 @@ else()
         ui/desktop/EditorToolbar.qml
         ui/desktop/SidebarView.qml
         ui/desktop/HomeView.qml
+        ui/common/SettingsOverlay.qml
         ui/common/AndroidLogin.qml
     )
 endif()
