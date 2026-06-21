@@ -5,6 +5,10 @@ This document defines the ViewModel layer of DCharVault. Located in the `/viewmo
 ## `LoginViewModel`
 Manages the authentication flow, vault creation, and system-level UI states.
 
+### Q_PROPERTIES (Bound to QML)
+*   `ClipboardSanitizer* sanitizer` (READ, CONSTANT)
+    Exposes the clipboard sanitizer utility to QML.
+
 ### Q_INVOKABLE Methods (Callable from QML)
 *   `void authenticate(SecurePasswordInput* passwordField, const QString& dbUrl)`
     Attempts to unlock an existing vault by passing the secure password buffer to the `DiaryManager`.
@@ -60,6 +64,39 @@ A customized `QAbstractListModel` that provides the QML views with a lightweight
 
 ---
 
+## `SessionViewModel`
+Coordinates auto-locking and application session states, interfacing directly with `DiaryManager`. It provides properties for the UI to react to the application's lock state and configuration for the inactivity timeout.
+
+### Q_PROPERTIES (Bound to QML)
+*   `bool isLocked` (READ, NOTIFY)
+    Indicates whether the vault is currently locked. The UI can bind to this to conditionally show the lock screen.
+*   `uint32_t timeoutSeconds` (READ, WRITE, NOTIFY)
+    The inactivity timeout duration in seconds.
+
+### Q_INVOKABLE Methods (Callable from QML)
+*   `void reportActivity()`
+    Records user interaction in the UI to reset the inactivity timer.
+*   `void lockNow()`
+    Forces an immediate lock of the vault and updates the session state.
+*   `void onUnlockSuccess()`
+    Called when the user successfully authenticates, transitioning the session back to an active state.
+*   `void setTimeoutSeconds(uint32_t seconds)`
+    Updates the session inactivity timeout.
+
+### Public Slots
+*   `void onApplicationStateChanged(Qt::ApplicationState state)`
+    Reacts to application background/foreground state changes to trigger locking logic.
+*   `void onVaultOpened()`
+    Notified when the vault is opened to initialize the session.
+
+### Signals (Emitted to QML)
+*   `void lockStateChanged()`: Emitted when the `isLocked` property changes.
+*   `void sessionLocked()`: Emitted when the vault enters the locked state.
+*   `void sessionUnlocked()`: Emitted when the vault returns to the active state.
+*   `void timeLimitChanged()`: Emitted when the timeout duration is modified.
+
+---
+
 ## `SecurePasswordInput`
 A security-focused UI helper component. It intercepts password keystrokes and stores them directly in a memory-safe `SecureString`, preventing the master password from lingering in Qt's standard string buffers.
 
@@ -93,3 +130,25 @@ A background security utility that monitors the operating system's clipboard and
     A Qt Slot connected to the OS clipboard. It detects if the user copies new data externally and aborts the wipe timer if necessary.
 *   `void executeSanitization()`
     The internal execution method that performs the actual memory overwrite of the clipboard.
+
+### Signals (Emitted to QML)
+*   `void clipboardSanitized()`: Emitted after the clipboard has been securely wiped.
+*   `void externalClipboardDetected()`: Emitted when an external clipboard change is detected, interrupting the sanitization flow.
+
+---
+
+## `TextHighlighter`
+A utility component that applies a background-color highlight to the currently selected text in a QML TextArea/TextEdit.
+
+### Q_PROPERTIES (Bound to QML)
+*   `QQuickTextDocument* textDocument` (READ, WRITE, NOTIFY)
+    The text document instance to apply highlights to.
+
+### Q_INVOKABLE Methods (Callable from QML)
+*   `void applyHighlight(int selStart, int selEnd, const QColor &color)`
+    Applies a highlight color to the specified text range.
+*   `void removeHighlight(int selStart, int selEnd)`
+    Removes the highlight from the specified text range.
+
+### Signals (Emitted to QML)
+*   `void textDocumentChanged()`: Emitted when the associated text document changes.

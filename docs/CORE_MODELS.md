@@ -65,6 +65,30 @@ Re-encrypts and updates an existing entry’s title and content.
 
 Permanently deletes an entry from the database.
 
+#### `lockVault`
+
+```cpp
+[[nodiscard]] DiaryError lockVault();
+```
+
+Securely wipes all memory containing sensitive vault data (such as the master key and decrypted entries) and effectively locks the active session.
+
+### `saveSessionTimeout`
+
+```cpp
+[[nodiscard]] DiaryError saveSessionTimeout(uint32_t seconds);
+```
+
+Saves the specified session timeout value to the database.
+
+### `loadSessionTimeout`
+
+```cpp
+uint32_t loadSessionTimeout() const;
+```
+
+Loads the currently configured session timeout value from the database.
+
 ---
 
 ### Data Retrieval
@@ -230,6 +254,30 @@ bool setConfigValue(
 
 Stores a configuration key-value pair (e.g., the vault salt or verification block).
 
+### `setJournalName`
+
+```cpp
+bool setJournalName(const QString& newJournal_name);
+```
+
+Updates the name of the journal in the database.
+
+### `setShareableStatus`
+
+```cpp
+bool setShareableStatus(const bool isShareable);
+```
+
+Sets the shareable status of the database.
+
+### `setSpecialStatus`
+
+```cpp
+bool setSpecialStatus(const QString& status);
+```
+
+Sets a special status flag in the database.
+
 ### `getConfigValue`
 
 ```cpp
@@ -237,6 +285,14 @@ QByteArray getConfigValue(const QString& key) const;
 ```
 
 Retrieves a configuration value by its key.
+
+### `getJournalName`
+
+```cpp
+QString getJournalName() const;
+```
+
+Retrieves the name of the journal from the database.
 
 ### `getAllEntriesMetadata`
 
@@ -261,6 +317,61 @@ QByteArray getEntryContent(int64_t id) const;
 ```
 
 Retrieves the raw encrypted content payload for a specific entry.
+
+---
+
+## `SessionManager`
+
+Manages session states and inactivity timeouts. It tracks user activity and provides information to trigger lock events.
+
+### `recordActivity`
+
+```cpp
+void recordActivity();
+```
+
+Updates the last activity timestamp to prevent the session from expiring.
+
+### `lock` / `unlock`
+
+```cpp
+void lock();
+void unlock();
+```
+
+Transitions the internal session state between `Locked` and `Active`.
+
+### `setTimeoutSeconds`
+
+```cpp
+void setTimeoutSeconds(uint32_t seconds);
+```
+
+Updates the session inactivity timeout.
+
+### `timeoutSeconds`
+
+```cpp
+uint32_t timeoutSeconds() const;
+```
+
+Retrieves the current inactivity timeout duration in seconds.
+
+### `isSessionExpired`
+
+```cpp
+[[nodiscard]] bool isSessionExpired() const;
+```
+
+Checks if the time since the last activity exceeds the configured timeout.
+
+### `state`
+
+```cpp
+SessionState state() const;
+```
+
+Returns the current state of the session (`Active`, `Locked`, or `LoggedOut`).
 
 ---
 

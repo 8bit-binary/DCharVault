@@ -15,21 +15,26 @@ graph TD
         LVM[LoginViewModel]
         DVM[DiaryViewModel]
         DLM[DiaryListModel]
+        SVM[SessionViewModel]
     end
     subgraph Model Layer [C++ Core Backend]
         DM[DiaryManager]
         EM[EncryptionManager]
         DBM[DatabaseManager]
         SA[SecureAllocator]
+        SM[SessionManager]
     end
 
     UI <-->|Property Bindings & Signals| LVM
     UI <-->|Property Bindings & Signals| DVM
     UI <-->|Property Bindings & Signals| DLM
+    UI <-->|Property Bindings & Signals| SVM
 
     LVM -->|Auth Commands| DM
     DVM -->|CRUD Commands| DM
     DLM -->|Fetch Metadata| DM
+    SVM -->|Lock Commands| DM
+    SVM -->|State| SM
 
     DM <-->|Payload & Keys| EM
     DM <-->|Encrypted SQLite| DBM
@@ -47,6 +52,7 @@ The Model layer is responsible for the core business logic, cryptography, secure
 * **`EncryptionManager`**: Wraps Libsodium to provide cryptographic operations. It handles master key derivation (Argon2id), data encryption/decryption (XChaCha20-Poly1305), and salt generation.
 * **`DatabaseManager`**: Manages the local SQLite database. It is responsible for storing and retrieving encrypted payloads, and handling database schemas and metadata.
 * **`SecureAllocator`**: A custom C++ allocator wrapping Libsodium's memory management (`sodium_malloc` / `sodium_free`) to prevent sensitive data (like keys or plaintext passwords) from being swapped to disk or scraped from RAM.
+* **`SessionManager`**: Tracks user activity and manages the application lock state with inactivity timeouts.
 * **`DiaryEntry` & `EntryMetadata`**: Data structures representing the state and metadata of diary entries.
 
 ### 2. The ViewModel Layer (`/viewmodel`)
@@ -57,8 +63,10 @@ The ViewModel layer serves as the bridge between the C++ Model and the QML front
 * **`LoginViewModel`**: Handles the authentication flow, including vault creation and login. It securely passes passwords to the model and updates the UI state based on authentication success or failure.
 * **`DiaryViewModel`**: Manages the state and operations for individual diary entries (reading, editing, deleting, saving).
 * **`DiaryListModel`**: Inherits from `QAbstractListModel` to provide a model for QML list views (like a list of recent entries). It interacts with `DiaryManager` to load and display entry metadata.
-* **`SecurePasswordInput`**: A specialized component for handling password input securely within the UI before it reaches the backend.
-* **`ClipboardSanitizer`**: A utility to monitor the system clipboard and securely wipe it after a timeout to prevent sensitive data leakage.
+*   **`SessionViewModel`**: Coordinates auto-locking and application session states, interfacing with `SessionManager` and `DiaryManager`.
+*   **`SecurePasswordInput`**: A specialized component for handling password input securely within the UI before it reaches the backend.
+*   **`ClipboardSanitizer`**: A utility to monitor the system clipboard and securely wipe it after a timeout to prevent sensitive data leakage.
+*   **`TextHighlighter`**: A utility component that applies background-color highlighting to currently selected text in a QML TextArea/TextEdit.
 
 ### 3. The View Layer (`/ui` & `Main.qml`)
 
