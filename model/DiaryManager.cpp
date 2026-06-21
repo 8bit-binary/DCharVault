@@ -10,7 +10,7 @@
 #include"TitleGenerators.h"
 
 namespace DefaultsDM_Values{
-    constexpr uint32_t DEFAULT_SESSION_TIMEOUT_SECONDS = 10; // 7mins default timeout session period
+    constexpr uint32_t DEFAULT_SESSION_TIMEOUT_SECONDS = 420; // 7mins default timeout session period
 }
 
 DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
