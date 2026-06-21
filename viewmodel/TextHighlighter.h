@@ -19,7 +19,7 @@ class TextHighlighter : public QObject
 
 public:
     explicit TextHighlighter(QObject *parent = nullptr)
-        : QObject(parent), m_textDocument(nullptr) {}
+        : QObject(parent) {}
 
     QQuickTextDocument* textDocument() const;
 
