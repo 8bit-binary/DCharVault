@@ -118,6 +118,12 @@ set(APP_QML_FILES
     ui/common/VaultPasswordField.qml
    # ui/common/loginView.qml
     ui/common/about.qml
+    ui/common/SettingsOverlay.qml
+    ui/common/AndroidLogin.qml
+    ui/common/micro-elements/DCharSwitch.qml
+    ui/common/micro-elements/DCharComboBox.qml
+    ui/common/tabs-settings/AppearanceTab.qml
+    ui/common/tabs-settings/SecurityTab.qml
 )
 
 
@@ -135,8 +141,6 @@ else()
         ui/desktop/EditorToolbar.qml
         ui/desktop/SidebarView.qml
         ui/desktop/HomeView.qml
-        ui/common/SettingsOverlay.qml
-        ui/common/AndroidLogin.qml
     )
 endif()
 
