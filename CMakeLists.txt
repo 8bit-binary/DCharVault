@@ -130,7 +130,6 @@ set(APP_QML_FILES
 if(ANDROID)
     list(APPEND APP_QML_FILES
         ui/android/EditorView.qml
-        ui/common/AndroidLogin.qml
         # ui/android/EditorToolbar.qml
         ui/android/SidebarView.qml
         ui/android/HomeView.qml
@@ -145,6 +144,8 @@ else()
 endif()
 
 set_source_files_properties(ui/common/ThemeManager.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
+list(REMOVE_DUPLICATES APP_QML_FILES)
 
 qt_add_qml_module(appDCharVault
     URI DCharVault
