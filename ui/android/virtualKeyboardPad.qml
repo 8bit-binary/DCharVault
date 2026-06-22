@@ -57,9 +57,15 @@ Item {
     }
 
     function handleKeyPress(charStr) {
+        console.log("Keyboard: Key pressed: " + charStr + ", targetInput: " + targetInput)
         if (targetInput) {
+            console.log("Keyboard: Calling targetInput.insertSecureByte...")
             targetInput.insertSecureByte(charStr.charCodeAt(0))
+            console.log("Keyboard: Inserted byte, current password length: " + targetInput.passwordLength)
+        } else {
+            console.log("Keyboard ERROR: targetInput is null or undefined!")
         }
+
         // Revert shift after one letter, unless caps locked
         if (keyboardMode === 0 && isShifted && !isCapsLocked) {
             isShifted = false

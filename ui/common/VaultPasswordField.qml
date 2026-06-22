@@ -78,13 +78,24 @@ Rectangle {
         }
 
         Loader {
+            id: kbLoader
             anchors.fill: parent
             source: Qt.platform.os === "android" ? "../android/virtualKeyboardPad.qml" : ""
             onLoaded: {
                 if (item) {
+                    console.log("VaultPasswordField: virtualKeyboardPad loaded! Assigning secureInput: " + secureInput)
                     item.targetInput = secureInput
+                } else {
+                    console.log("VaultPasswordField ERROR: virtualKeyboardPad loaded but item is null!")
                 }
             }
+        }
+        // Failsafe Binding
+        Binding {
+            target: kbLoader.item
+            property: "targetInput"
+            value: secureInput
+            when: kbLoader.item !== null
         }
     }
 }
