@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/DCharVault/DCharVault/main/.github/logo.png" alt="DCharVault Logo" width="200"/>
   <h1>DCharVault</h1>
-  <p><b>A cross-platform, zero-knowledge local journaling application focusing on secure memory management and native performance.</b></p>
+  <p><b>A cross-platform, zero-knowledge local journaling application focusing on security and native performance.</b></p>
 
   <!-- Badges -->
   <a href="https://qt.io"><img src="https://img.shields.io/badge/Qt-6.8-41CD52?logo=qt&logoColor=white" alt="Qt 6.8"></a>
@@ -132,23 +132,8 @@ DCharVault features an automated cross-compilation pipeline utilizing **GitHub A
 * 🤖 **Android (ARM64):** Cross-compiled via Qt Android toolchain with automated Release APK keystore signing.
 
 ---
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/DCharVault/DCharVault/issues).
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
 ## 📄 License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](https://github.com/DCharVault/DCharVault/blob/main/LICENSE) for details.
 
 ---
-<div align="center">
-  <i>Developed with ❤️ for privacy and security.</i>
-</div>
