@@ -128,6 +128,7 @@ if(ANDROID)
         # ui/android/EditorToolbar.qml
         ui/android/SidebarView.qml
         ui/android/HomeView.qml
+        ui/android/virtualKeyboardPad.qml
     )
 else()
     list(APPEND APP_QML_FILES

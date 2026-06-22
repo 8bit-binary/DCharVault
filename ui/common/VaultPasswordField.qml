@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import Vault.Security 1.0
+
 Rectangle {
     id: root
     property string placeholderText: "Enter Password"
@@ -9,13 +10,22 @@ Rectangle {
     property alias secureInputComponent: secureInput
 
     //custom signal so parent file knows when Enter is pressed
-    signal enterPressed()
-
+    signal enterPressed
 
     color: ThemeManager.bgInput
     border.color: secureInput.activeFocus ? ThemeManager.colorAccent : ThemeManager.lineBorder
     border.width: secureInput.activeFocus ? 2 : 1
     radius: 7
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            secureInput.forceActiveFocus()
+            if (Qt.platform.os === "android") {
+                keyboardPopup.open()
+            }
+        }
+    }
 
     SecurePasswordInput {
         id: secureInput
@@ -44,7 +54,37 @@ Rectangle {
         }
 
         onEnterPressed: {
+            if (keyboardPopup.opened) {
+                keyboardPopup.close()
+            }
             root.enterPressed()
+        }
+    }
+
+    Popup {
+        id: keyboardPopup
+        parent: Overlay.overlay
+        width: parent ? parent.width : root.width
+        height: 350
+        y: parent ? parent.height - height : 0
+        margins: 0
+        padding: 0
+        modal: false
+        focus: false
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: ThemeManager.bgCard ? ThemeManager.bgCard : "#FAFAFA"
+        }
+
+        Loader {
+            anchors.fill: parent
+            source: Qt.platform.os === "android" ? "../android/virtualKeyboardPad.qml" : ""
+            onLoaded: {
+                if (item) {
+                    item.targetInput = secureInput
+                }
+            }
         }
     }
 }
