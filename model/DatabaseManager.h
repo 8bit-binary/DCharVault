@@ -18,6 +18,7 @@ public:
     DatabaseManager();
     bool databaseInit(const QString& dbPath);
     bool createTable();
+    void closeDatabase();
 
     bool setConfigValue(const QString& key, const QByteArray& value);
 

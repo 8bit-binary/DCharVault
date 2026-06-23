@@ -42,6 +42,8 @@ DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
     std::vector<DiaryEntry>().swap(entries);
     std::unordered_map<int64_t, size_t>().swap(idToIndex);
 
+    dbManager.closeDatabase();
+
     return DiaryError::None;
 }
 
