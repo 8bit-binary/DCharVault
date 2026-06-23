@@ -12,7 +12,6 @@ Item {
     signal createDiaryClicked
     signal settingsClicked
 
-    // Global margin for consistent alignment
     readonly property int globalMargin: 16
 
     Component.onCompleted: {
@@ -20,259 +19,261 @@ Item {
         diaryListModel.loadEntries()
     }
 
-    RowLayout {
+    ColumnLayout {
         anchors.fill: parent
         spacing: 0
 
-        ColumnLayout {
+        // 1. TOP HEADER (Notebook Name & Search)
+        Rectangle {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            height: 110
+            color: ThemeManager.bgCard
 
-            spacing: 0
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.leftMargin: root.globalMargin
+                anchors.rightMargin: root.globalMargin
+                anchors.topMargin: 12
+                anchors.bottomMargin: 12
+                spacing: 12
 
-            // ------------------------------------------
-            // 1. TOP HEADER (Notebook Name)
-            // ------------------------------------------
-            Rectangle {
-                Layout.fillWidth: true
-                height: 60 // Slightly taller to give the button room
-                color: ThemeManager.bgCard
-
+                // Title Row
                 RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: root.globalMargin
-                    anchors.rightMargin: root.globalMargin
+                    Layout.fillWidth: true
 
                     Text {
-                        text: "My Notebook"
-                        font.pixelSize: 20 // Slightly larger to feel like a header
+                        text: "My Notebook ▾"
+                        font.pixelSize: 20
                         font.bold: true
                         color: ThemeManager.textMain
                         Layout.fillWidth: true
                     }
-
-                    // Dropdown button fixed to prevent overflow
-                    ToolButton {
-                        text: "▾"
-                        font.pixelSize: 24
-                        Layout.preferredWidth: 40
-                        Layout.preferredHeight: 40
-                        // Make the button background transparent so it doesn't create an ugly grey circle
-                        background: Rectangle {
-                            color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.surfaceElevated : "transparent")
-                            radius: ThemeManager.radiusPill
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 150
-                                }
-                            }
-                        }
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: ThemeManager.textMain
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                    }
-
-                    // Settings Overrelay
-                    ToolButton {
-                        text: "⚙"
-                        font.pixelSize: 18
-                        Layout.preferredWidth: 40
-                        Layout.preferredHeight: 40
-                        background: Rectangle {
-                            color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.surfaceElevated : "transparent")
-                            radius: ThemeManager.radiusPill
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 150
-                                }
-                            }
-                        }
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: ThemeManager.textMain
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: {
-                            root.settingsClicked()
-                        }
-                    }
                 }
 
-                // Bottom border for the header
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    anchors.bottom: parent.bottom
-                    color: ThemeManager.lineBorder
-                }
-            }
+                // Search Input
+                TextField {
+                    id: searchInput
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 36
+                    color: ThemeManager.textMain
+                    verticalAlignment: TextInput.AlignVCenter
+                    leftPadding: 12
+                    placeholderText: ""
 
-            // ------------------------------------------
-            // 2. NOTE LIST (Note name & metadata)
-            // ------------------------------------------
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                color: ThemeManager.bgVault
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 12
+                        text: "🔍 Search..."
+                        color: ThemeManager.textMuted
+                        font.pixelSize: 14
 
-                ListView {
-                    id: noteList
-                    anchors.fill: parent
-                    clip: true
-
-                    // The secret to perfect list margins:
-                    leftMargin: root.globalMargin
-                    rightMargin: root.globalMargin
-                    topMargin: 12
-                    bottomMargin: 12
-                    spacing: 8
-
-                    ScrollBar.vertical: ScrollBar {
-                        width: 8
-                        policy: ScrollBar.AsNeeded // Only shows if content is larger than view
-                        active: true // Keeps it visible while scrolling
+                        visible: !searchInput.activeFocus
+                                 && searchInput.text === ""
                     }
 
-                    model: diaryListModel
-
-                    delegate: Rectangle {
-                        // Dynamically calculate width based on the ListView's margins
-                        width: ListView.view.width - ListView.view.leftMargin
-                               - ListView.view.rightMargin
-                        height: 70
-
+                    background: Rectangle {
+                        color: ThemeManager.bgInput
                         radius: ThemeManager.radiusDefault
-                        border.color: noteList.currentIndex
-                                      === index ? ThemeManager.colorAccent : ThemeManager.lineBorder
-                        border.width: noteList.currentIndex === index ? 2 : 1
-                        color: noteList.currentIndex === index ? ThemeManager.surfaceElevated : (delegateMouseArea.containsMouse ? ThemeManager.bgButtonHover : ThemeManager.bgCard)
-                        Behavior on color {
+                        border.color: searchInput.activeFocus ? ThemeManager.colorAccent : ThemeManager.lineBorder
+                        border.width: searchInput.activeFocus ? 2 : 1
+                        Behavior on border.color {
                             ColorAnimation {
                                 duration: 150
                             }
                         }
-
-                        ColumnLayout {
-                            anchors.fill: parent
-                            anchors.margins: 12
-                            spacing: 4
-
-                            // Note Name
-                            Text {
-                                text: model.title
-                                font.pixelSize: 16
-                                font.bold: true
-                                color: ThemeManager.textMain
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight //STOPS TEXT OVERFLOW
-                            }
-
-                            // Metadata (Date, size, preview, etc.)
-                            Text {
-                                text: Qt.formatDateTime(
-                                          new Date(model.createdAt * 1000),
-                                          "MMM d, yyyy")
-                                font.pixelSize: 13
-                                color: ThemeManager.textMuted
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
-                            }
-                        }
-
-                        MouseArea {
-                            id: delegateMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                noteList.currentIndex = index
-                                root.entrySelected(model.id, model.title)
-                            }
-                        }
                     }
                 }
             }
 
-            // ------------------------------------------
-            // 3. BOTTOM BAR (Search, Filter, Add Note)
-            // ------------------------------------------
             Rectangle {
-                Layout.fillWidth: true
-                height: 64 // Slightly taller for better touch targets
-                color: ThemeManager.bgCard
+                width: parent.width
+                height: 1
+                anchors.bottom: parent.bottom
+                color: ThemeManager.lineBorder
+            }
+        }
 
-                // Top border for the bottom bar
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    anchors.top: parent.top
-                    color: ThemeManager.lineBorder
+        // 2. NOTE LIST
+        Rectangle {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            color: ThemeManager.bgVault
+
+            ListView {
+                id: noteList
+                anchors.fill: parent
+                clip: true
+
+                leftMargin: root.globalMargin
+                rightMargin: root.globalMargin
+                topMargin: 12
+                bottomMargin: 12
+                spacing: 8
+
+                ScrollBar.vertical: ScrollBar {
+                    width: 8
+                    policy: ScrollBar.AsNeeded
+                    active: true
                 }
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: root.globalMargin
-                    anchors.rightMargin: root.globalMargin
-                    spacing: 12
+                model: diaryListModel
 
-                    // Search Input
-                    TextField {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 40
-                        placeholderText: "🔍 Search..."
-                        color: ThemeManager.textMain
-                        background: Rectangle {
-                            color: ThemeManager.bgInput
-                            radius: ThemeManager.radiusPill
-                            border.color: parent.activeFocus ? ThemeManager.colorAccent : ThemeManager.lineBorder
-                            border.width: parent.activeFocus ? 2 : 1
-                            Behavior on border.color {
-                                ColorAnimation {
-                                    duration: 150
-                                }
-                            }
+                delegate: Rectangle {
+                    id: delegateRoot
+                    // 12px right gutter for scrollbar
+                    width: ListView.view.width - ListView.view.leftMargin
+                           - ListView.view.rightMargin - 12
+                    height: 64
+                    radius: ThemeManager.radiusDefault
+
+                    color: noteList.currentIndex === index ? ThemeManager.surfaceElevated : (delegateMouseArea.containsMouse ? ThemeManager.bgButtonHover : ThemeManager.bgCard)
+                    border.color: ThemeManager.lineBorder
+                    border.width: noteList.currentIndex === index ? 0 : 1
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 150
                         }
-                        verticalAlignment: TextInput.AlignVCenter
-                        leftPadding: 12
                     }
 
-                    // Add New Note Button
-                    Button {
-                        text: "+"
-                        font.pixelSize: 24
-                        Layout.preferredWidth: ThemeManager.controlHeight
-                        Layout.preferredHeight: ThemeManager.controlHeight
+                    // Accent left border for active item
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.margins: 1
+                        width: 3
+                        color: ThemeManager.colorAccent
+                        visible: noteList.currentIndex === index
+                        radius: 2
+                    }
 
-                        background: Rectangle {
-                            color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.bgButtonHover : ThemeManager.bgButton)
-                            radius: ThemeManager.radiusPill
-                            border.color: ThemeManager.lineBorder
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 150
-                                }
-                            }
-                        }
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 12
+                        // Push text slightly to the right if the accent border is visible
+                        anchors.leftMargin: 12 + (noteList.currentIndex === index ? 4 : 0)
+                        spacing: 2
+
+                        Text {
+                            text: model.title
+                            font.pixelSize: 16
+                            font.bold: true
                             color: ThemeManager.textMain
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
                         }
 
-                        ToolTip.visible: hovered
-                        ToolTip.text: "Add new note"
-
-                        onClicked: {
-                            root.createClicked()
+                        Text {
+                            text: Qt.formatDateTime(
+                                      new Date(model.createdAt * 1000),
+                                      "MMM d, yyyy")
+                            font.pixelSize: 13
+                            color: ThemeManager.textMuted
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
                         }
                     }
+
+                    MouseArea {
+                        id: delegateMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            noteList.currentIndex = index
+                            root.entrySelected(model.id, model.title)
+                        }
+                    }
+                }
+            }
+        }
+
+        // BOTTOM BAR
+        Rectangle {
+            Layout.fillWidth: true
+            height: 64
+            color: ThemeManager.bgCard
+
+            // Top Border
+            Rectangle {
+                width: parent.width
+                height: 1
+                anchors.top: parent.top
+                color: ThemeManager.lineBorder
+            }
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: root.globalMargin
+                anchors.rightMargin: root.globalMargin
+                spacing: 12
+
+                // LEFT SIDE: Settings Button
+                ToolButton {
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 40
+                    background: Rectangle {
+                        color: parent.down ? ThemeManager.bgButtonHover : (parent.hovered ? ThemeManager.surfaceElevated : "transparent")
+                        radius: ThemeManager.radiusDefault
+                    }
+                    contentItem: Text {
+                        text: "⚙"
+                        font.pixelSize: 20
+                        color: ThemeManager.textMain
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: root.settingsClicked()
+                }
+
+                // RIGHT SIDE: Responsive New Note Button
+                Button {
+                    id: newNoteBtn
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 40
+                    clip: true // SAFETY NET: Nothing is ever allowed to bleed outside this button again
+
+                    background: Rectangle {
+                        color: parent.down ? Qt.darker(
+                                                 ThemeManager.colorAccent,
+                                                 1.1) : ThemeManager.colorAccent
+                        radius: ThemeManager.radiusPill
+                        scale: parent.pressed ? 0.98 : (parent.hovered ? 1.02 : 1.0)
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: 150
+                            }
+                        }
+                    }
+
+                    contentItem: Item {
+                        anchors.fill: parent
+
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: 8
+
+                            Text {
+                                text: "+"
+                                font.pixelSize: 18
+                                color: "#FFFFFF"
+                                font.bold: true
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: "New Note"
+                                font.pixelSize: 14
+                                color: "#FFFFFF"
+                                font.bold: true
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: newNoteBtn.width > 110
+                            }
+                        }
+                    }
+
+                    onClicked: root.createClicked()
                 }
             }
         }
