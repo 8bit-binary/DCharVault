@@ -10,7 +10,6 @@ Item {
 
     property var targetInput // The SecurePasswordInput component this keyboard controls
 
-
     // State properties
     property int keyboardMode: 0 // 0: letters, 1: symbols1, 2: symbols2
     property bool isShifted: false
@@ -57,59 +56,55 @@ Item {
     }
 
     function handleKeyPress(charStr) {
-        console.log("Keyboard: Key pressed: " + charStr + ", targetInput: " + targetInput)
         if (targetInput) {
-            console.log("Keyboard: Calling targetInput.insertSecureByte...")
             targetInput.insertSecureByte(charStr.charCodeAt(0))
-            console.log("Keyboard: Inserted byte, current password length: " + targetInput.passwordLength)
-        } else {
-            console.log("Keyboard ERROR: targetInput is null or undefined!")
         }
-
         // Revert shift after one letter, unless caps locked
         if (keyboardMode === 0 && isShifted && !isCapsLocked) {
             isShifted = false
         }
     }
 
-    // Visual indicator (Shows *** instead of characters)
-    RowLayout {
-        id: indicatorRow
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.margins: 10
-        spacing: 10 // Added spacing so the indicator dots don't bleed together
+    // A reusable custom styled button component for keys
+    component KeyButton: Button {
+        id: btn
+        property bool isSpecial: false
+        Layout.fillWidth: true
+        Layout.fillHeight: true
 
-        Repeater {
-            model: targetInput ? targetInput.passwordLength : 0
-            Rectangle {
-                width: 15; height: 15; radius: 7.5
-                color: ThemeManager.textMain
-            }
+        background: Rectangle {
+            color: btn.pressed ? ThemeManager.keyBgPressed : (btn.isSpecial ? ThemeManager.keyBgSpecial : ThemeManager.keyBg)
+            radius: 6
+            // Subtle border to distinguish keys slightly if needed
+            border.color: ThemeManager.lineBorder
+            border.width: 1
+        }
+        contentItem: Text {
+            text: btn.text
+            color: ThemeManager.textMain
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: 18
+            // Make letters regular, special keys slightly bolder
+            font.bold: btn.isSpecial
         }
     }
 
     // The Custom Keyboard Grid
     GridLayout {
-        anchors.top: indicatorRow.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
         anchors.margins: 10
 
-        rowSpacing: 5
-        columnSpacing: 5
+        rowSpacing: 8
+        columnSpacing: 6
         columns: 10 // Standard QWERTY layout width
 
         // --- Row 1 (10 Items -> Fills 10 columns) ---
         Repeater {
             model: getRow(1)
 
-            Button {
+            KeyButton {
                 text: modelData
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
                 onClicked: {
                     handleKeyPress(modelData)
                 }
@@ -126,11 +121,8 @@ Item {
         Repeater {
             model: getRow(2)
 
-            Button {
+            KeyButton {
                 text: modelData
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
                 onClicked: {
                     handleKeyPress(modelData)
                 }
@@ -138,10 +130,9 @@ Item {
         }
 
         // --- Row 3 (1 Shift + 7 Items + 2 Span Backspace -> Fills 10 columns) ---
-        Button {
+        KeyButton {
+            isSpecial: true
             text: keyboardMode === 0 ? (isCapsLocked ? "⇪" : (isShifted ? "⬆" : "⇧")) : (keyboardMode === 1 ? "=\\<" : "?123")
-            Layout.fillWidth: true
-            Layout.fillHeight: true
 
             onClicked: {
                 if (keyboardMode === 0) {
@@ -169,21 +160,17 @@ Item {
         Repeater {
             model: getRow(3)
 
-            Button {
+            KeyButton {
                 text: modelData
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
                 onClicked: {
                     handleKeyPress(modelData)
                 }
             }
         }
 
-        Button {
+        KeyButton {
+            isSpecial: true
             text: "⌫"
-            Layout.fillWidth: true
-            Layout.fillHeight: true
             Layout.columnSpan: 2 // Spans 2 columns to balance the grid
 
             onClicked: {
@@ -192,10 +179,9 @@ Item {
         }
 
         // --- Row 4 (2 Span Symbols + 5 Span Space + 3 Span Enter -> Fills 10 columns) ---
-        Button {
+        KeyButton {
+            isSpecial: true
             text: keyboardMode === 0 ? "?123" : "ABC"
-            Layout.fillWidth: true
-            Layout.fillHeight: true
             Layout.columnSpan: 2
 
             onClicked: {
@@ -207,10 +193,8 @@ Item {
             }
         }
 
-        Button {
+        KeyButton {
             text: "Space"
-            Layout.fillWidth: true
-            Layout.fillHeight: true
             Layout.columnSpan: 5
 
             onClicked: {
@@ -218,10 +202,9 @@ Item {
             }
         }
 
-        Button {
+        KeyButton {
+            isSpecial: true
             text: "Enter"
-            Layout.fillWidth: true
-            Layout.fillHeight: true
             Layout.columnSpan: 3
 
             onClicked: {

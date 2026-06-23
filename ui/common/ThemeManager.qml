@@ -27,6 +27,12 @@ QtObject {
     readonly property color textMuted: isDark ? "#A98B95" : "#8A6A75"
     readonly property color lineBorder: isDark ? "#4A2438" : "#E5D5C8"
 
+    // virtual Keyboard specific colors
+    readonly property color keyboardBg: isDark ? "#20121D" : "#EAE0D5"
+    readonly property color keyBg: isDark ? "#34192A" : "#FFFFFF"
+    readonly property color keyBgSpecial: isDark ? "#4A2438" : "#F5E6C8"
+    readonly property color keyBgPressed: isDark ? "#5C2C46" : "#E0E0E0"
+
     readonly property int marginGlobal: 16
     readonly property int radiusDefault: 12
     readonly property int radiusPill: 999
