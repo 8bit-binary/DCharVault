@@ -37,10 +37,11 @@ Rectangle {
             anchors.margins: 12
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: 24
-            color: "#111111"
+            color: ThemeManager.textMain
 
             // Dynamically creates a string of dots exactly as long as input password
-            text: "".padStart(secureInput.passwordLength, "•")
+            text: "•".repeat(secureInput.passwordLength)
+
 
             // Placeholder text for empty condition
             Text {
@@ -74,7 +75,7 @@ Rectangle {
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         background: Rectangle {
-            color: ThemeManager.bgCard ? ThemeManager.bgCard : "#FAFAFA"
+            color: ThemeManager.keyboardBg
         }
 
         Loader {
