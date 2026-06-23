@@ -80,6 +80,21 @@ bool DatabaseManager::createTable(){
     return true;
 }
 
+void DatabaseManager::closeDatabase() {
+    if (QSqlDatabase::contains(QSqlDatabase::defaultConnection)) {
+        {
+            QSqlDatabase db = QSqlDatabase::database(QSqlDatabase::defaultConnection);
+            if (db.isOpen()) {
+                db.close();
+            }
+        }
+        QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
+        qDebug() << "Success: Database connection closed securely.";
+    } else {
+        qDebug() << "Info: No database connection existed to close.";
+    }
+}
+
 bool DatabaseManager::setConfigValue(const QString &key, const QByteArray &value){
     QSqlQuery query;
     query.prepare("INSERT OR REPLACE INTO vault_config (key, value) VALUES (:key, :value)");
