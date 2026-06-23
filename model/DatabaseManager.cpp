@@ -10,7 +10,14 @@ DatabaseManager::DatabaseManager(){}
 bool DatabaseManager::databaseInit(const QString& dbPath){
     // check if already a connection exists
     if(QSqlDatabase::contains(QSqlDatabase::defaultConnection)){
-        return true;
+        {
+            QSqlDatabase existingDb = QSqlDatabase::database(QSqlDatabase::defaultConnection);
+            if(existingDb.databaseName() == dbPath && existingDb.isOpen()){
+                return true;
+            }
+            existingDb.close();
+        }
+        QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
     }
 
     // driver
@@ -20,10 +27,10 @@ bool DatabaseManager::databaseInit(const QString& dbPath){
 
     // check if openable
     if(!db.open()){
-        qCritical()<<"Fatal Error: Failed to connect to Database"<<db.lastError().text()<<'\n';
+        qCritical()<<"Fatal Error: Failed to connect to Database"<<db.lastError().text();
         return false;
     }
-    qDebug()<<"Success: SQLite database connected at "<<dbPath<<'\n';
+    qDebug()<<"Success: SQLite database connected at "<<dbPath;
     return true;
 }
 
