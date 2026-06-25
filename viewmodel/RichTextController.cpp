@@ -93,6 +93,12 @@ void RichTextController::setHeading(int selStart, int selEnd, int level)
     // Clamp level: 0 = normal, 1-3 = headings
     level = qBound(0, level, 3);
 
+    // Clamp inputs to prevent signed integer UB on selEnd - 1
+    const int docLen = doc->characterCount();
+    selStart = qBound(0, selStart, docLen);
+    selEnd   = qBound(0, selEnd,   docLen);
+    if (selStart > selEnd) std::swap(selStart, selEnd);
+
     QTextCursor cursor(doc);
     cursor.setPosition(selStart);
     if (selEnd > selStart)
@@ -124,8 +130,7 @@ void RichTextController::setHeading(int selStart, int selEnd, int level)
         } else {
             // Reset to normal: clear bold weight and font size
             charFmt.setFontWeight(QFont::Normal);
-            // Use 0 to let it inherit the default document font size
-            charFmt.clearProperty(QTextFormat::FontPointSize);
+            charFmt.setFontPointSize(0.0);  // 0.0 = inherit document default; mergeCharFormat will push it through
         }
         blockCursor.mergeCharFormat(charFmt);
 
@@ -373,10 +378,15 @@ void RichTextController::setFontFamily(int selStart, int selEnd, const QString &
 
 bool RichTextController::isUrlSchemeAllowed(const QString &url)
 {
+    // only accepting url with limit of 2048
+    if (url.length() > 2048)
+        return false;
+
     // Sec-TradeOff: Strict URL scheme whitelist.
     // Only http://, https://, and mailto: are allowed.
     // Blocks javascript:, file://, data:, vbscript:, etc.
     QUrl parsed(url, QUrl::StrictMode);
+
     if (!parsed.isValid())
         return false;
 
