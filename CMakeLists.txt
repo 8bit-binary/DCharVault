@@ -153,7 +153,6 @@ qt_add_qml_module(appDCharVault
     QML_FILES
         ${APP_QML_FILES}
     SOURCES
-        # Headers for to MOC knows about Q_PROPERTY and Q_INVOKABLE
         model/DiaryEntry.h
         model/DiaryManager.h
         model/DatabaseManager.h
@@ -169,6 +168,7 @@ qt_add_qml_module(appDCharVault
         viewmodel/ClipboardSanitizer.h
         viewmodel/SessionViewModel.h
         viewmodel/TextHighlighter.h
+        viewmodel/RichTextController.h
 
         viewmodel/LoginViewModel.cpp
         viewmodel/DiaryViewModel.cpp
@@ -177,6 +177,7 @@ qt_add_qml_module(appDCharVault
         viewmodel/ClipboardSanitizer.cpp
         viewmodel/SessionViewModel.cpp
         viewmodel/TextHighlighter.cpp
+        viewmodel/RichTextController.cpp
 )
 
 # The auto-generated qmltyperegistrations.cpp does #include <TextHighlighter.h>
