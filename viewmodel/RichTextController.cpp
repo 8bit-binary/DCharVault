@@ -51,7 +51,85 @@ QStringList RichTextController::availableFontFamilies() const
     return QFontDatabase::families();
 }
 
-// Strikethrough
+void RichTextController::setBold(int selStart, int selEnd, bool enable)
+{
+    QTextDocument *doc = document();
+    if (!doc || selStart == selEnd)
+        return;
+
+    QTextCursor cursor(doc);
+    cursor.setPosition(selStart);
+    cursor.setPosition(selEnd, QTextCursor::KeepAnchor);
+
+    QTextCharFormat fmt;
+    fmt.setFontWeight(enable ? QFont::Bold : QFont::Normal);
+    cursor.mergeCharFormat(fmt);
+}
+
+void RichTextController::setItalic(int selStart, int selEnd, bool enable)
+{
+    QTextDocument *doc = document();
+    if (!doc || selStart == selEnd)
+        return;
+
+    QTextCursor cursor(doc);
+    cursor.setPosition(selStart);
+    cursor.setPosition(selEnd, QTextCursor::KeepAnchor);
+
+    QTextCharFormat fmt;
+    fmt.setFontItalic(enable);
+    cursor.mergeCharFormat(fmt);
+}
+
+void RichTextController::setUnderline(int selStart, int selEnd, bool enable)
+{
+    QTextDocument *doc = document();
+    if (!doc || selStart == selEnd)
+        return;
+
+    QTextCursor cursor(doc);
+    cursor.setPosition(selStart);
+    cursor.setPosition(selEnd, QTextCursor::KeepAnchor);
+
+    QTextCharFormat fmt;
+    fmt.setFontUnderline(enable);
+    cursor.mergeCharFormat(fmt);
+}
+
+void RichTextController::setFontSize(int selStart, int selEnd, qreal pointSize)
+{
+    QTextDocument *doc = document();
+    if (!doc || selStart == selEnd)
+        return;
+
+    // Clamp to safe range
+    pointSize = qBound(6.0, pointSize, 88.0);
+
+    QTextCursor cursor(doc);
+    cursor.setPosition(selStart);
+    cursor.setPosition(selEnd, QTextCursor::KeepAnchor);
+
+    QTextCharFormat fmt;
+    fmt.setFontPointSize(pointSize);
+    cursor.mergeCharFormat(fmt);
+}
+
+void RichTextController::setTextColor(int selStart, int selEnd, const QColor &color)
+{
+    QTextDocument *doc = document();
+    if (!doc || selStart == selEnd)
+        return;
+
+    QTextCursor cursor(doc);
+    cursor.setPosition(selStart);
+    cursor.setPosition(selEnd, QTextCursor::KeepAnchor);
+
+    QTextCharFormat fmt;
+    fmt.setForeground(QBrush(color));
+    cursor.mergeCharFormat(fmt);
+}
+
+// ─── Strikethrough ───────────────────────────────────────────────────────────
 
 void RichTextController::toggleStrikethrough(int selStart, int selEnd)
 {

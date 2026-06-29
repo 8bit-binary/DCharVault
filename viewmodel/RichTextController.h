@@ -41,11 +41,27 @@ public:
 
     //  Text Style Formatting
 
+    /** @brief Set bold state on selection. Merge-safe: preserves other formatting. */
+    Q_INVOKABLE void setBold(int selStart, int selEnd, bool enable);
+
+    /** @brief Set italic state on selection. Merge-safe. */
+    Q_INVOKABLE void setItalic(int selStart, int selEnd, bool enable);
+
+    /** @brief Set underline state on selection. Merge-safe. */
+    Q_INVOKABLE void setUnderline(int selStart, int selEnd, bool enable);
+
+    /** @brief Set font point size on selection. Merge-safe: won't strip bold/italic/etc. */
+    Q_INVOKABLE void setFontSize(int selStart, int selEnd, qreal pointSize);
+
+    /** @brief Set text foreground color on selection. Merge-safe. */
+    Q_INVOKABLE void setTextColor(int selStart, int selEnd, const QColor &color);
+
     /** @brief Toggle strikethrough on the selection [selStart, selEnd). */
     Q_INVOKABLE void toggleStrikethrough(int selStart, int selEnd);
 
-    /** @brief Explicitly set strikethrough state on the selection. */
+    /** @brief Explicitly set strikethrough state on the selection. Merge-safe. */
     Q_INVOKABLE void setStrikethrough(int selStart, int selEnd, bool enable);
+
 
     //  Block-Level Formatting
 
