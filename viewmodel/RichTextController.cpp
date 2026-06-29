@@ -414,9 +414,9 @@ void RichTextController::outdent(int cursorPos)
     if (list) {
         // For list items, decrease the list indent
         QTextListFormat listFmt = list->format();
-        int currentIndent = listFmt.indent();
-        if (currentIndent > 1) {
-            listFmt.setIndent(currentIndent - 1);
+        const int currentLevel = qMax(0, listFmt.indent() - 1);
+        if (currentLevel > 0) {
+            listFmt.setIndent(currentLevel);
             list->setFormat(listFmt);
         }
     } else {
@@ -752,7 +752,7 @@ int RichTextController::currentIndentLevel(int cursorPos)
     // Check list indent first
     QTextList *list = block.textList();
     if (list)
-        return list->format().indent();
+        return qMax(0, list->format().indent() - 1);
 
     // Fall back to block indent
     return block.blockFormat().indent();
