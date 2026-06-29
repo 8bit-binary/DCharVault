@@ -383,15 +383,15 @@ void RichTextController::indent(int cursorPos)
     if (list) {
         // For list items, increase the list indent
         QTextListFormat listFmt = list->format();
-        const int currentLevel = qMax(0, listFmt.indent() - 1);
-        if (currentLevel < kMaxIndentLevel) {
+        const int currentIndent = qMax(0, listFmt.indent() - 1);
+        if (currentIndent < kMaxIndentLevel) {
             listFmt.setIndent(currentIndent + 2);
             list->setFormat(listFmt);
         }
     } else {
         // For normal blocks, increase text indent
         QTextBlockFormat blockFmt = cursor.blockFormat();
-        int currentIndent = blockFmt.indent();
+        const int currentIndent = blockFmt.indent();
         if (currentIndent < kMaxIndentLevel) {
             blockFmt.setIndent(currentIndent + 1);
             // Also set left margin for visual effect
@@ -414,15 +414,15 @@ void RichTextController::outdent(int cursorPos)
     if (list) {
         // For list items, decrease the list indent
         QTextListFormat listFmt = list->format();
-        const int currentLevel = qMax(0, listFmt.indent() - 1);
-        if (currentLevel > 0) {
-            listFmt.setIndent(currentLevel);
+        const int currentIndent = qMax(0, listFmt.indent() - 1);
+        if (currentIndent > 0) {
+            listFmt.setIndent(currentIndent);
             list->setFormat(listFmt);
         }
     } else {
         // For normal blocks, decrease text indent
         QTextBlockFormat blockFmt = cursor.blockFormat();
-        int currentIndent = blockFmt.indent();
+        const int currentIndent = blockFmt.indent();
         if (currentIndent > 0) {
             blockFmt.setIndent(currentIndent - 1);
             blockFmt.setLeftMargin(qMax(0.0, (currentIndent - 1) * kIndentStep));
