@@ -1,5 +1,6 @@
 #include "RichTextController.h"
 
+#include<utility>
 #include <QTextDocument>
 #include <QTextBlock>
 #include <QTextList>
@@ -48,7 +49,8 @@ QTextDocument* RichTextController::document() const
 
 QStringList RichTextController::availableFontFamilies() const
 {
-    return QFontDatabase::families();
+    static const QStringList families = QFontDatabase::families();
+    return families;
 }
 
 void RichTextController::setBold(int selStart, int selEnd, bool enable)
@@ -381,9 +383,9 @@ void RichTextController::indent(int cursorPos)
     if (list) {
         // For list items, increase the list indent
         QTextListFormat listFmt = list->format();
-        int currentIndent = listFmt.indent();
-        if (currentIndent < kMaxIndentLevel) {
-            listFmt.setIndent(currentIndent + 1);
+        const int currentLevel = qMax(0, listFmt.indent() - 1);
+        if (currentLevel < kMaxIndentLevel) {
+            listFmt.setIndent(currentIndent + 2);
             list->setFormat(listFmt);
         }
     } else {
@@ -439,7 +441,7 @@ void RichTextController::setFontFamily(int selStart, int selEnd, const QString &
 
     // Sec-TradeOff: Validate against system-installed fonts only
     // This prevents injection of external/network font references
-    QStringList systemFonts = QFontDatabase::families();
+    const QStringList systemFonts = availableFontFamilies();
     if (!systemFonts.contains(family, Qt::CaseInsensitive))
         return;
 
@@ -456,7 +458,7 @@ void RichTextController::setFontFamily(int selStart, int selEnd, const QString &
 
 bool RichTextController::isUrlSchemeAllowed(const QString &url)
 {
-    // only accepting url with limit of 2048
+    // Only accept URLs up to 2048 characters.
     if (url.length() > 2048)
         return false;
 
