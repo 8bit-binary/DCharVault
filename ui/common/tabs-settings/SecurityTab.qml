@@ -12,8 +12,12 @@ ColumnLayout {
         Text { text: "Manage Application/Journal Security."; color: ThemeManager.textMuted; wrapMode: Text.WordWrap }
     }
 
-    RowLayout {
+    GridLayout {
         Layout.fillWidth: true
+        columns: 2
+        rowSpacing: 32
+        columnSpacing: 16
+
         Text { text: "Session Timeout"; font.pixelSize: 16; color: ThemeManager.textMain; Layout.fillWidth: true }
 
         DCharComboBox {
@@ -30,6 +34,24 @@ ColumnLayout {
             Component.onCompleted: currentIndex = indexOfValue(diarySessionModel.timeoutSeconds)
             onActivated: diarySessionModel.setTimeoutSeconds(currentValue)
         }
+
+        Text { text: "Clipboard Timeout"; font.pixelSize: 16; color: ThemeManager.textMain; Layout.fillWidth: true }
+
+        DCharComboBox {
+            Layout.preferredWidth: 150
+
+            model: ListModel {
+                ListElement { text: "10 Seconds"; value: 10 }
+                ListElement { text: "30 Seconds"; value: 30 }
+                ListElement { text: "1 Minute"; value: 60 }
+                ListElement { text: "2 Minutes"; value: 120 }
+                ListElement { text: "5 Minutes"; value: 300 }
+            }
+
+            Component.onCompleted: currentIndex = indexOfValue(loginViewModel.sanitizer.timeoutSeconds)
+            onActivated: loginViewModel.sanitizer.timeoutSeconds = currentValue
+        }
     }
+
     Item { Layout.fillHeight: true }
 }

@@ -79,6 +79,8 @@ public:
 
     [[nodiscard]] DiaryError saveSessionTimeout(uint32_t seconds);
     uint32_t loadSessionTimeout() const;
+    [[nodiscard]] DiaryError saveClipboardTimeout(uint32_t seconds);
+    uint32_t loadClipboardTimeout() const;
 
 
 private:
