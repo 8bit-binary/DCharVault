@@ -11,7 +11,7 @@
 
 namespace DefaultsDM_Values{
     constexpr uint32_t DEFAULT_SESSION_TIMEOUT_SECONDS = 420; // 7mins default timeout session period
-    constexpr uint32_t DEFAULT_CLIPBOARD_TIMEOUT_SECONDS = 30;  // 30s default clipboard timeoutclipboard
+    constexpr uint32_t DEFAULT_CLIPBOARD_TIMEOUT_SECONDS = 30;  // 30s default clipboard timeout
 }
 
 DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
@@ -109,7 +109,7 @@ uint32_t DiaryManager::loadSessionTimeout() const
 uint32_t DiaryManager::loadClipboardTimeout() const
 {
     if (!isVaultOpened()) {
-        return DefaultsDM_Values::DEFAULT_SESSION_TIMEOUT_SECONDS;
+        return DefaultsDM_Values::DEFAULT_CLIPBOARD_TIMEOUT_SECONDS;
     }
     const QString clipboardTimeout = "clipboard_timeout";
     const QByteArray encClipboardBytes = dbManager.getConfigValue(clipboardTimeout);
