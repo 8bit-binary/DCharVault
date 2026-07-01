@@ -232,16 +232,27 @@ Item {
                     id: newNoteBtn
                     Layout.fillWidth: true
                     Layout.preferredHeight: 40
-                    clip: true // SAFETY NET: Nothing is ever allowed to bleed outside this button again
+                    clip: true
 
                     background: Rectangle {
-                        color: parent.down ? Qt.darker(
-                                                 ThemeManager.colorAccent,
-                                                 1.1) : ThemeManager.colorAccent
+                        // Clean, state-driven colors pulled directly from ThemeManager
+                        color: parent.down ? ThemeManager.bgPrimaryActionPressed : (parent.hovered ? ThemeManager.bgPrimaryActionHover : ThemeManager.bgPrimaryAction)
+
+                        border.color: ThemeManager.borderPrimaryAction
+                        border.width: ThemeManager.isDark ? 1 : 0 // Optional: keeps the border strictly for dark mode
+
                         radius: ThemeManager.radiusPill
                         scale: parent.pressed ? 0.98 : (parent.hovered ? 1.02 : 1.0)
+
                         Behavior on scale {
                             NumberAnimation {
+                                duration: 150
+                            }
+                        }
+
+                        // Smoothly animate the color changes on hover/press
+                        Behavior on color {
+                            ColorAnimation {
                                 duration: 150
                             }
                         }
