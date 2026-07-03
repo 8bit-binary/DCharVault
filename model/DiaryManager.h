@@ -77,6 +77,9 @@ public:
 
     bool isVaultOpened() const;
 
+    // Android: track original content:// URI for sync-back on lock
+    void setContentUri(const QString& contentUri, const QString& localCachePath);
+
     [[nodiscard]] DiaryError saveSessionTimeout(uint32_t seconds);
     uint32_t loadSessionTimeout() const;
     [[nodiscard]] DiaryError saveClipboardTimeout(uint32_t seconds);
@@ -84,7 +87,9 @@ public:
 
 
 private:
-    QString journal_name; 
+    QString journal_name;
+    QString m_contentUri;     // Android: original content:// URI for sync-back
+    QString m_localCachePath; // Android: sandbox path we actually opened
     SecureVector masterKey;
     DatabaseManager dbManager;
     EncryptionManager encManager;

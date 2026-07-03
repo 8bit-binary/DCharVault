@@ -71,3 +71,32 @@ void SecurePasswordInput::keyPressEvent(QKeyEvent *event){
     QQuickItem::keyPressEvent(event);
 }
 
+void SecurePasswordInput::insertSecureByte(int byteCode){
+    if(byteCode>=0 && byteCode<=255){
+        m_secureBuffer.push_back(static_cast<char>(byteCode));
+        emit passwordLengthChanged();
+    }
+}
+
+void SecurePasswordInput::insertSecureText(const QString& text){
+    if(text.isEmpty()) return;
+    QByteArray bytes = text.toUtf8();
+    for (char b : std::as_const(bytes)) {
+        m_secureBuffer.push_back(b);
+    }
+    bytes.fill('\0'); // wipe temp buffer
+    emit passwordLengthChanged();
+}
+
+
+void SecurePasswordInput::removeSecureByte(){
+    if(!m_secureBuffer.empty()){
+        m_secureBuffer.back() = '\0';
+        m_secureBuffer.pop_back();
+        emit passwordLengthChanged();
+    }
+}
+
+void SecurePasswordInput::submitPassword(){
+    emit enterPressed();
+}

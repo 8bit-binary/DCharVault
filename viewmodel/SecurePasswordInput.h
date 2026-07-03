@@ -24,6 +24,12 @@ public:
     // loginViewModel now can pull secure string purely in C++
     const SecureString& getSecureBuffer() const;
 
+    // custom in-app keyboard hooks
+    Q_INVOKABLE void insertSecureByte(int byteCode);
+    Q_INVOKABLE void insertSecureText(const QString& text);
+    Q_INVOKABLE void removeSecureByte();
+    Q_INVOKABLE void submitPassword();
+
 signals:
     void passwordLengthChanged();
     void enterPressed();
