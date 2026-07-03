@@ -2,7 +2,7 @@
 #include <algorithm>
 
 #include<QDebug>
-
+#include<QFile>
 #include<QTextDocument>
 #include<QDateTime>
 #include<string>
@@ -19,8 +19,27 @@ DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
     return &entries[it->second];
 }
 
+void DiaryManager::setContentUri(const QString& contentUri, const QString& localCachePath) {
+    m_contentUri = contentUri;
+    m_localCachePath = localCachePath;
+}
+
 [[nodiscard]] DiaryError DiaryManager::lockVault(){
     if(!isVaultOpened()){ return DiaryError::None; }
+
+    // Android: sync encrypted .db back to original content:// URI before wiping
+    if (!m_contentUri.isEmpty() && !m_localCachePath.isEmpty()) {
+        QFile src(m_localCachePath);
+        QFile dst(m_contentUri);
+        if (src.open(QIODevice::ReadOnly) && dst.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            dst.write(src.readAll());
+            qDebug() << "DiaryManager: Synced encrypted vault back to external storage.";
+        } else {
+            qWarning() << "DiaryManager: Failed to sync vault back to" << m_contentUri;
+        }
+        m_contentUri.clear();
+        m_localCachePath.clear();
+    }
 
     sodium_memzero(masterKey.data(), masterKey.capacity());
     masterKey.clear();

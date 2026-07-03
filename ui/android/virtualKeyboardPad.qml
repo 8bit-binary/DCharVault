@@ -57,7 +57,7 @@ Item {
 
     function handleKeyPress(charStr) {
         if (targetInput) {
-            targetInput.insertSecureByte(charStr.charCodeAt(0))
+            targetInput.insertSecureText(charStr)
         }
         // Revert shift after one letter, unless caps locked
         if (keyboardMode === 0 && isShifted && !isCapsLocked) {
