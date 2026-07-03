@@ -11,6 +11,7 @@
 
 namespace DefaultsDM_Values{
     constexpr uint32_t DEFAULT_SESSION_TIMEOUT_SECONDS = 420; // 7mins default timeout session period
+    constexpr uint32_t DEFAULT_CLIPBOARD_TIMEOUT_SECONDS = 30;  // 30s default clipboard timeout
 }
 
 DiaryEntry* DiaryManager::findEntryById(const int64_t id) {
@@ -61,6 +62,8 @@ void DiaryManager::setContentUri(const QString& contentUri, const QString& local
     std::vector<DiaryEntry>().swap(entries);
     std::unordered_map<int64_t, size_t>().swap(idToIndex);
 
+    dbManager.closeDatabase();
+
     return DiaryError::None;
 }
 
@@ -101,6 +104,43 @@ uint32_t DiaryManager::loadSessionTimeout() const
     if (!isValidSeconds) {
         qWarning() << "Invalid session timeout in database. Using default.";
         return DefaultsDM_Values::DEFAULT_SESSION_TIMEOUT_SECONDS;
+    }
+    return seconds;
+}
+
+[[nodiscard]] DiaryError DiaryManager::saveClipboardTimeout(uint32_t seconds)
+{
+    if (!isVaultOpened()) {
+        return DiaryError::MasterKeyNotFound;
+    }
+    const QString clipboardTimeout = "clipboard_timeout";
+    const QString clipboardSecs = QString::number(seconds);
+    const QByteArray valueBytes = encManager.encryptString(clipboardSecs,masterKey);
+    if (valueBytes.isEmpty()) {
+        return DiaryError::EncryptionFailed;
+    }
+
+    if(!dbManager.setConfigValue(clipboardTimeout, valueBytes)){
+        return DiaryError::DatabaseError;
+    }
+    return DiaryError::None;
+}
+uint32_t DiaryManager::loadClipboardTimeout() const
+{
+    if (!isVaultOpened()) {
+        return DefaultsDM_Values::DEFAULT_CLIPBOARD_TIMEOUT_SECONDS;
+    }
+    const QString clipboardTimeout = "clipboard_timeout";
+    const QByteArray encClipboardBytes = dbManager.getConfigValue(clipboardTimeout);
+    const QString valueBytes = encManager.decryptString(encClipboardBytes,masterKey);
+    if (valueBytes.isEmpty()) {
+        return DefaultsDM_Values::DEFAULT_CLIPBOARD_TIMEOUT_SECONDS;
+    }
+    bool isValidSeconds;
+    uint32_t seconds = valueBytes.toUInt(&isValidSeconds);
+    if (!isValidSeconds) {
+        qWarning() << "Invalid clipboard timeout in database. Using default.";
+        return DefaultsDM_Values::DEFAULT_CLIPBOARD_TIMEOUT_SECONDS;
     }
     return seconds;
 }

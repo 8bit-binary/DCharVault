@@ -16,6 +16,11 @@ QtObject {
     readonly property color bgCard: isDark ? "#2A1620" : "#FFFFFF"
     readonly property color bgInput: isDark ? "#1A0F18" : "#FAF3EC"
 
+    readonly property color bgPrimaryAction: isDark ? "#4A2438" : colorAccent
+    readonly property color bgPrimaryActionHover: isDark ? Qt.lighter("#4A2438", 1.15) : Qt.lighter(colorAccent, 1.1)
+    readonly property color bgPrimaryActionPressed: isDark ? Qt.darker("#4A2438", 1.1) : Qt.darker(colorAccent, 1.1)
+    readonly property color borderPrimaryAction: isDark ? Qt.lighter("#4A2438", 1.3) : "transparent"
+
     readonly property color surfaceElevated: isDark ? "#34192A" : "#F5E6C8"
     readonly property color bgButton: surfaceElevated
     readonly property color bgButtonHover: isDark ? Qt.lighter(surfaceElevated, 1.2) : Qt.darker(surfaceElevated, 1.1)

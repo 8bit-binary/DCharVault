@@ -1,4 +1,6 @@
 #include"ClipboardSanitizer.h"
+#include"model/DiaryManager.h"
+
 #include<QGuiApplication>
 #include<QString>
 #include<QMimeData>
@@ -8,12 +10,13 @@
 #include <QDebug>
 #endif
 
-ClipboardSanitizer::ClipboardSanitizer(int timeoutMs, QObject *parent) : QObject(parent), m_clipboard(QGuiApplication::clipboard()), m_ownsClipboard(false){
+ClipboardSanitizer::ClipboardSanitizer(DiaryManager* manager, int defaultTimeoutMs, QObject *parent)
+    : QObject(parent), m_clipboard(QGuiApplication::clipboard()), m_diaryManager(manager), m_timeoutSeconds(defaultTimeoutMs / 1000), m_ownsClipboard(false){
     // Hard crash immediately on boot if OS denies clipboard access
     Q_ASSERT_X(m_clipboard != nullptr, "ClipboardSanitizer", "FATAL: System clipboard is inaccessible.");
 
     m_wipeTimer.setSingleShot(true);
-    m_wipeTimer.setInterval(timeoutMs);
+    m_wipeTimer.setInterval(m_timeoutSeconds * 1000);
 
     connect(&m_wipeTimer, &QTimer::timeout, this, &ClipboardSanitizer::executeSanitization);
     connect(m_clipboard, &QClipboard::dataChanged, this, &ClipboardSanitizer::onSystemClipboardChanged);
@@ -23,6 +26,33 @@ ClipboardSanitizer::~ClipboardSanitizer() {
     // If app is closed, then only wipe if apps sensitive data is still in there.
     if (m_ownsClipboard) {
         executeSanitization();
+    }
+}
+
+uint32_t ClipboardSanitizer::timeoutSeconds() const {
+    return m_timeoutSeconds;
+}
+
+void ClipboardSanitizer::setTimeoutSeconds(uint32_t seconds) {
+    if (m_timeoutSeconds == seconds) return;
+    m_timeoutSeconds = seconds;
+    m_wipeTimer.setInterval(seconds * 1000);
+
+    if (m_diaryManager) {
+        const DiaryError error = m_diaryManager->saveClipboardTimeout(seconds);
+        if(error != DiaryError::None){
+            // debug here
+        }
+    }
+    emit timeoutChanged();
+}
+
+void ClipboardSanitizer::onVaultOpened() {
+    if (m_diaryManager) {
+        uint32_t saved = m_diaryManager->loadClipboardTimeout();
+        m_timeoutSeconds = saved;
+        m_wipeTimer.setInterval(saved * 1000);
+        emit timeoutChanged();
     }
 }
 

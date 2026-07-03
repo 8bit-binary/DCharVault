@@ -118,13 +118,18 @@ set(APP_QML_FILES
     ui/common/VaultPasswordField.qml
    # ui/common/loginView.qml
     ui/common/about.qml
+    ui/common/SettingsOverlay.qml
+    ui/common/AndroidLogin.qml
+    ui/common/micro-elements/DCharSwitch.qml
+    ui/common/micro-elements/DCharComboBox.qml
+    ui/common/tabs-settings/AppearanceTab.qml
+    ui/common/tabs-settings/SecurityTab.qml
 )
 
 
 if(ANDROID)
     list(APPEND APP_QML_FILES
         ui/android/EditorView.qml
-        ui/common/AndroidLogin.qml
         # ui/android/EditorToolbar.qml
         ui/android/SidebarView.qml
         ui/android/HomeView.qml
@@ -136,12 +141,12 @@ else()
         ui/desktop/EditorToolbar.qml
         ui/desktop/SidebarView.qml
         ui/desktop/HomeView.qml
-        ui/common/SettingsOverlay.qml
-        ui/common/AndroidLogin.qml
     )
 endif()
 
 set_source_files_properties(ui/common/ThemeManager.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
+list(REMOVE_DUPLICATES APP_QML_FILES)
 
 qt_add_qml_module(appDCharVault
     URI DCharVault
@@ -149,7 +154,6 @@ qt_add_qml_module(appDCharVault
     QML_FILES
         ${APP_QML_FILES}
     SOURCES
-        # Headers for to MOC knows about Q_PROPERTY and Q_INVOKABLE
         model/DiaryEntry.h
         model/DiaryManager.h
         model/DatabaseManager.h
@@ -165,6 +169,7 @@ qt_add_qml_module(appDCharVault
         viewmodel/ClipboardSanitizer.h
         viewmodel/SessionViewModel.h
         viewmodel/TextHighlighter.h
+        viewmodel/RichTextController.h
 
         viewmodel/LoginViewModel.cpp
         viewmodel/DiaryViewModel.cpp
@@ -173,6 +178,7 @@ qt_add_qml_module(appDCharVault
         viewmodel/ClipboardSanitizer.cpp
         viewmodel/SessionViewModel.cpp
         viewmodel/TextHighlighter.cpp
+        viewmodel/RichTextController.cpp
 )
 
 # The auto-generated qmltyperegistrations.cpp does #include <TextHighlighter.h>
