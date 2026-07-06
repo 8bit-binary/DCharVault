@@ -196,7 +196,7 @@ Page {
         shortcut: StandardKey.Bold
         checkable: true
         checked: editorArea.cursorSelection.font.bold
-        onTriggered: editorArea.cursorSelection.font.bold = checked
+        onTriggered: richTextController.setBold(editorArea.selectionStart, editorArea.selectionEnd, checked)
     }
     Action {
         id: italicAction
@@ -204,7 +204,7 @@ Page {
         shortcut: StandardKey.Italic
         checkable: true
         checked: editorArea.cursorSelection.font.italic
-        onTriggered: editorArea.cursorSelection.font.italic = checked
+        onTriggered: richTextController.setItalic(editorArea.selectionStart, editorArea.selectionEnd, checked)
     }
     Action {
         id: underlineAction
@@ -212,11 +212,11 @@ Page {
         shortcut: StandardKey.Underline
         checkable: true
         checked: editorArea.cursorSelection.font.underline
-        onTriggered: editorArea.cursorSelection.font.underline = checked
+        onTriggered: richTextController.setUnderline(editorArea.selectionStart, editorArea.selectionEnd, checked)
     }
 
-    TextHighlighter {
-        id: textHighlighter
+    RichTextController {
+        id: richTextController
         textDocument: editorArea.textDocument
     }
 
@@ -226,9 +226,9 @@ Page {
         selectedColor: root.colorMode === 0 ? editorArea.cursorSelection.color : "#FFFF00"
         onAccepted: {
             if (colorMode == 0) {
-                editorArea.cursorSelection.color = selectedColor
+                richTextController.setTextColor(editorArea.selectionStart, editorArea.selectionEnd, selectedColor)
             } else {
-                textHighlighter.applyHighlight(editorArea.selectionStart,
+                richTextController.applyHighlight(editorArea.selectionStart,
                                                editorArea.selectionEnd,
                                                selectedColor)
             }
@@ -289,9 +289,9 @@ Page {
         onItalicClicked: italicAction.trigger()
         onUnderlineClicked: underlineAction.trigger()
 
-        onFontSizeSelected: size => {
-                                editorArea.cursorSelection.font.pointSize = size
-                                editorArea.forceActiveFocus()
+
+        onFontSizeSelected: function(size){
+                                richTextController.setFontSize(editorArea.selectionStart, editorArea.selectionEnd, size)
                             }
 
         onColorClicked: {
