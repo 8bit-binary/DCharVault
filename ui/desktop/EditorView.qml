@@ -215,8 +215,8 @@ Page {
         onTriggered: editorArea.cursorSelection.font.underline = checked
     }
 
-    TextHighlighter {
-        id: textHighlighter
+    RichTextController {
+        id: richTextController
         textDocument: editorArea.textDocument
     }
 
@@ -228,7 +228,7 @@ Page {
             if (colorMode == 0) {
                 editorArea.cursorSelection.color = selectedColor
             } else {
-                textHighlighter.applyHighlight(editorArea.selectionStart,
+                richTextController.applyHighlight(editorArea.selectionStart,
                                                editorArea.selectionEnd,
                                                selectedColor)
             }
